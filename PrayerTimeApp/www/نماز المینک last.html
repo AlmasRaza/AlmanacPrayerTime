@@ -1,0 +1,4398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<title>تحقیقی المینک</title>
+
+<script language="JavaScript">
+
+var dtr = Math.PI/180;
+
+// Main function
+function Main()
+{
+window.status = "Calculating...   Please wait.";
+ReadData();
+dataF();
+calculation();
+Noutput();
+Output();
+//gen();
+window.status = "Done.";
+}
+
+
+//Auxiliary functions
+
+//Sine of angles in degrees
+function sind(x)
+{
+return Math.sin(dtr*x);
+}
+
+//Cosine of angles in degrees
+function cosd(x)
+{
+return Math.cos(dtr*x);
+}
+
+//Tangent of angles in degrees
+function tand(x)
+{
+return Math.tan(dtr*x);
+}
+
+
+
+
+//Normalize large angles
+function norm_360_deg(x)
+{
+while (x<0) {
+x+=360;
+}
+return x%360;
+}
+//Normalize any 360
+function loo(x)
+{
+{with (Math)
+if (x<0) sn=-1;
+else sn=1;
+z=Math.floor(Math.abs(x)/360);
+w= (Math.abs(x)/360-z)*360;
+y=Math.floor(z);
+if(y%2==0) mt=0;
+else mt=1;
+
+u=sn*w
+//if ( u>180) u=u-360
+//else if ( u<-180) u=360+u
+
+}
+return u;
+}
+
+//Output Hour Angle
+function OutHA(x)
+{
+with(Math)
+	{
+	var GHAdeg = floor(x);
+	var GHAmin = floor(60*(x-GHAdeg));	
+	var GHAsec = round(3600000*(x-GHAdeg-GHAmin/60))/1000;
+	if (GHAsec==60) {GHAsec=0; GHAmin+=1};
+	if (GHAmin==60) {GHAmin=0; GHAdeg+=1};
+	if (GHAdeg==0) GHAdeg="000";
+		else if (GHAdeg<10) GHAdeg="00"+GHAdeg;
+			else if (GHAdeg<100) GHAdeg="0"+GHAdeg;
+	if (GHAmin==0) GHAmin="00";
+		else if (GHAmin<10) GHAmin="0"+GHAmin;
+	if (GHAsec<10) GHAsec="0"+GHAsec;
+	return " "+GHAdeg+"°"+" "+GHAmin+"'"+" "+GHAsec+"''";
+	}
+}
+
+//Output Mean Obliqity of Ecliptic
+function OutECL(x)
+{
+with(Math)
+	{
+	var ECLdeg = floor(x);
+	var ECLmin = floor(60*(x-ECLdeg));	
+	var ECLsec = round(3600000*(x-ECLdeg-ECLmin/60))/1000;
+	if (ECLsec==60) {ECLsec=0; ECLmin+=1};
+	if (ECLmin==60) {ECLmin=0; ECLdeg+=1};
+	if (ECLmin==0) ECLmin="00";
+		else if (ECLmin<10) ECLmin="0"+ECLmin;
+	if (ECLsec<10) ECLsec="0"+ECLsec;
+	return " "+ECLdeg+"°"+" "+ECLmin+"'"+" "+ECLsec+"''";
+	}
+}
+
+//Output Sidereal Time
+function OutSidTime(x)
+{
+with(Math)
+	{
+	var GMSTdecimal = x/15;
+	var GMSTh = floor(GMSTdecimal);
+	var GMSTmdecimal = 60*(GMSTdecimal-GMSTh);
+	var GMSTm = floor(GMSTmdecimal);
+	var GMSTsdecimal = 60*(GMSTmdecimal-GMSTm);
+	var GMSTs = round(1000*GMSTsdecimal)/1000;
+	if (GMSTs-floor(GMSTs)==0) GMSTs+=".000";
+		else if (10*GMSTs-floor(10*GMSTs)==0) GMSTs+="00";
+			else if (100*GMSTs-floor(100*GMSTs)==0) GMSTs+="0";
+	return " "+GMSTh+"h"+" "+GMSTm+"m"+" "+GMSTs+"s";
+	}
+}
+
+
+//Output Declination
+function OutDec(x)
+{
+with(Math)
+	{
+	if (x<0)  {var signDEC=-1; var name="-";}
+		else  {var signDEC=1; var name="";}
+	var DEC = abs(x);
+	var DECdeg = floor(DEC);
+	var DECmin = floor(60*(DEC-DECdeg));	
+	var DECsec = round(3600000*(DEC-DECdeg-DECmin/60))/1000;
+	if (DECsec==60) {DECsec=0; DECmin+=1};
+	if (DECmin==60) {DECmin=0; DECdeg+=1};
+	if (DECdeg==0) DECdeg="00";
+		else if (DECdeg<10) DECdeg="0"+DECdeg;	
+	if (DECmin==0) DECmin="00";
+		else if (DECmin<10) DECmin="0"+DECmin;
+	if (DECsec<10) DECsec="0"+DECsec;
+	return ""+name+""+DECdeg+"°"+""+DECmin+"’"+""+DECsec+"”";
+	}
+}
+//Output Time
+function time(x)
+{
+with(Math)
+	{
+
+	if (x>24) { var x = x-24; var name = "T";}
+	else if ( x<0 ) { var x= x+24; var name ="Y";}
+	else { var x=x; var name ="";}
+	var DEC = abs(x);
+	var DECdeg = floor(DEC);
+	var DECmin = floor(60*(DEC-DECdeg));	
+	var DECsec = round(3600000*(DEC-DECdeg-DECmin/60))/1000;
+	if (DECsec==60) {DECsec=0; DECmin+=1};
+	if (DECmin==60) {DECmin=0; DECdeg+=1};
+	if (DECdeg==0) DECdeg="00";
+		else if (DECdeg<10) DECdeg="0"+DECdeg;	
+	if (DECmin==0) DECmin="00";
+		else if (DECmin<10) DECmin="0"+DECmin;
+	if (DECsec<10) DECsec="0"+DECsec;
+	if ( isNaN(x) ) name2= " نہ ممکن";
+	if ( isFinite(x)) name2 = name+DECdeg+":"+DECmin+":"+DECsec;
+	return name2;
+	}
+}
+
+function tim(x)
+{
+with(Math)
+	{
+
+	if (x>24) { var x = x-24; var name = "T";}
+	else if ( x<0 ) { var x= x+24; var name ="Y";}
+	else { var x=x; var name ="";}
+	var DEC = abs(x);
+	var DECdeg = floor(DEC);
+	var DECmin = round(60*(DEC-DECdeg));	
+	var DECsec = round(3600*(DEC-DECdeg-DECmin/60));
+	if (DECsec==60) {DECsec=0; DECmin+=1};
+	if (DECmin==60) {DECmin=0; DECdeg+=1};
+	if (DECdeg==0) DECdeg="00";
+		else if (DECdeg<10) DECdeg="0"+DECdeg;	
+	if (DECmin==0) DECmin="00";
+		else if (DECmin<10) DECmin="0"+DECmin;
+	if (DECsec<10) DECsec="0"+DECsec;
+	if ( isNaN(x) ) name2= " نہ ممکن";
+	if ( isFinite(x)) name2 = name+DECdeg+":"+DECmin;
+	return name2;
+	}
+}
+
+function disdt(y,m,d)
+{
+with(Math)
+	{
+var today  = new Date(y,m-1,d);
+dt= today.toLocaleDateString("ur-US");
+}
+return dt;
+}
+//Output SD and HP
+function OutSDHP(x)
+{
+with(Math)
+	{
+	x = round(1000*x)/1000;
+	if (x-floor(x)== 0) x+=".0";
+	return " "+x+"''";
+	}
+}
+
+//EOT
+function eot(a)
+{
+with(Math)
+{
+t= norf(a,loo(15*24*dayfraction))/15;
+if (t<0) t +=12;
+else t -=12;
+}
+return t;
+}
+function eota(a){
+with(Math){
+s=loo(15*24*dayfraction)
+if (s<180) s = s+180;
+else s = s-180;
+t= norf(a,s)/15;}
+return t;}
+function chk(a,b) {
+	with (Math)
+	{
+	c = a-b;
+	if (c<0 && a<0) c=" ناقص متناقص";
+	else if (c<0 && a>=0 ) c=" زائد متناقص";
+	else if (c>=0 && a<0 ) c=" ناقص متزائد";
+	else if (c>=0 && a>=0 ) c=" زائد متزائد";
+	else c = "";}
+	return c;
+	}
+//AR
+function arh(a)
+{
+with(Math)
+{
+ar= GHAAtrue-a;
+if (ar<0) ar +=360;
+ar = ar/15;
+}
+return ar;
+}
+//RA to GHA
+function rtg(a)
+{
+with(Math)
+{
+a = a*15;
+ar= GHAAtrue-a;
+if (ar<0) ar +=360;
+}
+return ar;
+}
+function namaz(a,t,m,z,e,f)
+	{
+with(Math)
+		{
+		hr = 12 - toolb/15 + e + f * acos((cosd(z) - sind (arzb) * sind (m ))/(cosd(arzb) * cosd(m)))/15/dtr;
+		}
+	}
+function nmz(z,e,m,f)
+	{ with(Math) 
+		hr = 12 - toolb/15 + e + f * acos((cosd(z) - sind (arzb) * sind (m ))/(cosd(arzb) * cosd(m)))/15/dtr;
+		return hr;} 
+	
+	
+function ref11(t,p,z)
+{
+{with(Math)
+var ref= p/1010*283/(273+t)*1.02*tand(z-10.3/(95.11-z))/60;
+         }
+         return ref;
+         }
+function ref12(t,p,z)
+{
+{with(Math)
+var ref= refa2r = p/1010 * 283/(273 + t) * tand ( z- 7.31/ (94.4 - z))/60;      
+         }
+         return ref;
+         }
+        
+       function d360 (f,d)
+       {
+       {with(Math)
+       if (f>0)  {var  dc = 90 - d ;}
+       else {var dc = 270 - d  ;}
+       }
+       return   + dc  ;
+       }
+      
+      function GHA(GHA)
+      {
+      {with (Math)
+      if ( GHA > 180 ) GHA = GHA -360;
+      }
+      return GHA;
+      }
+      
+       function norf(b,d)
+       {
+       {with (Math)
+       var f = d-b;
+       if (f<-180) var f= 360- Math.abs(f);
+       else if ( f > 180) var f =f-360;
+       else      var f = f;
+       }
+       return +f;
+       }
+       
+       function dirp2p(a,b,c,d,e)
+       {
+       {with (Math)
+      b= b*e;
+      if (b>180) b = b-360;
+      if (b < -180 ) b = b+360;
+      if (d>180) d = d-360;
+      if (d < -180 ) d = d+360;
+       f= norf(b,d);
+       var dir = Math.atan((tand(a) * cosd (c) - sind (c)* cosd (f ))/ sind (f))/dtr;
+       if (f<0)  {var dirs = 90 + dir ;}
+       else {var dirs = 270 + dir;}
+       }
+       return dirs;
+       }
+       
+       function disp2p(a,b,c,d,e)
+       {
+       {with (Math)
+       b= b*e;
+       if (b>180) b = b-360;
+       if (b < -180 ) b = b+360;
+       if (d>180) d = d-360;
+       if (d < -180 ) d = d+360;
+       f= norf(b,d);
+       var dis = Math.acos(cosd(f)*cosd(a)*cosd(c)+sind(a)*sind(c))/dtr*6378.137/180*Math.PI;
+       if (dis<1) {dst = ""+ Math.round(100000*dis)/100000*1000 + " m";}
+       else { dst = ""+ Math.round(10000*dis)/10000+ " km";}
+       }
+       return dst;
+       }
+    
+function elv(a,b,c,d,e)
+    {
+    {with (Math)
+    b= b*e;
+    if (b>180) b = b-360;
+    if (b < -180 ) b = b+360;
+    if (d>180) d = d-360;
+    if (d < -180 ) d = d+360;
+    f= norf(b,d);
+    //sunE = asin ( sind(arzb) * sind (DECsun) + cosd ( arzb) * cosd( DECsun) * cosd (sunf))/dtr ;
+    
+     hight = Math.asin (sind(c) * sind (a) + cosd (c) * cosd(a) * cosd (f))/dtr ;
+     }
+     return hight
+     }
+     
+     
+       function fdirt (Z,DEC,dir,arz,f)
+       {with(Math)
+       { if (dir <= 180) { var dir = dir-90;}
+       else { var dir = dir-270;}
+       dirf= Z + 2*atan((cosd(DEC)*(tand(dir)+f*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+       }
+       return +dirf;
+       }
+function fasal(GHA,toolb)
+{
+	{with (Math)
+	if (toolb >180) toolb = toolb-360;
+	if (toolb < -180 ) toolb = toolb+360;
+	fasal = toolb+GHA;
+	if (fasal>180) fasal = fasal-360;
+	}
+	return fasal;
+	}
+
+
+      
+      
+// Input data conversion
+//function ReadData()
+function ReadData()
+{
+with(document)
+	{
+	 am1 = eval(InForm.am1.value);
+	 var cdate=new Date();
+	 var cyear=cdate.getFullYear();
+	 var cmonth=cdate.getMonth()+1;
+	 var cday =cdate.getDate(); 
+	 var chour1= cdate.getHours();
+	 var cmin1= cdate.getMinutes();
+	 var csec1 = cdate.getSeconds();
+	 var cmi = cdate.getMilliseconds();
+	 var tzone = cdate.getTimezoneOffset();
+	 chour= chour1+cmin1/60+(csec1+cmi/1000)/3600;
+	 if (am1== 1) year26 = cyear;
+//	else if(InForm.year.value == "") alert("Missing year! Restart calculation.صلو على الحبيب");
+		else year26 = eval(InForm.year.value);	
+		if (am1== 1 ) month26 = cmonth;
+//	else if(InForm.month.value == "")  alert("Missing month! Restart calculation.صلو على الحبيب");
+		else month26 = eval(InForm.month.value);
+//	if(month26 < 1 || month26 > 12) alert("Month out of range! Restart calculation.صلو على الحبيب");
+	if (am1== 1) day26 = cday;
+//	else if(InForm.day.value == "") alert("Missing day! Restart calculation.");
+		else day26 = eval(InForm.day.value);
+//	if(day26 < 1 || day26 > 31) alert("Day out of range! Restart calculation.صلو على الحبيب");	
+//if (am1==1 && isNaN(disdt(year26,month26,day26))) alert ( "درست تاریخ کا اندراج کریں")
+	var schj=0;
+	if(year26/4-Math.floor(year26/4) == 0) schj=1;
+	if(year26/100-Math.floor(year26/100) == 0) schj=0;
+	if(year26/400-Math.floor(year26/400) == 0) schj=1;
+	if(month26 == 2 && day26 > 28 && schj == 0) alert("February has only 28 days! Restart calculation.صلو على الحبيب");
+	if(month26 == 2 && day26 > 29 && schj == 1) alert("February has only 29 days in a leap year! Restart calculation.صلو على الحبيب"); 
+	if(month26 == 4 && day26 > 30) alert("April has only 30 days! Restart calculation.صلو على الحبيب");
+	if(month26 == 6 && day26 > 30) alert("June has only 30 days! Restart calculation.صلو على الحبيب");
+	if(month26 == 9 && day26 > 30) alert("September has only 30 days! Restart calculation.صلو على الحبيب");
+	if(month26 == 11 && day26 > 30) alert("November has only 30 days! Restart calculation.صلو على الحبيب");
+		if(InForm.toolb.value == "")  toolb = 0;
+		else toolb = eval(InForm.toolb.value);
+		if(InForm.arzb.value == "")  arzb = 0;
+		else arzb = eval(InForm.arzb.value);
+		if(OutForm.tools.value == "")  tools = 0;
+		else tools = eval(OutForm.tools.value);
+		if(OutForm.arzs.value == "")  arzs = 0;
+		else arzs = eval(OutForm.arzs.value);
+if(InForm.st1.value == "")  st1 = 0;
+else st1 = eval(InForm.st1.value);
+	if(InForm.hour.value == "") var hour26 = 0;
+		else var hour26 = eval(InForm.hour.value);					
+
+	if(InForm.minute.value == "") var minute26 = 0;
+		else var minute26 = eval(InForm.minute.value);
+	if(InForm.second.value == "") var second26 = 0;
+		else var second26 = eval(InForm.second.value);
+		dayfraction2 = (hour26-st1 + minute26/60 + second26/3600);
+		if (am1 ==3) hour26 = hour26-st1+minute26/60+second26/3600;
+		else hour26 = 12-toolb/15;
+		 dayfraction = hour26/24;
+//	if(dayfraction < 0 || dayfraction > 1) alert("Time out of range! Restart calculation.صلو على الحبيب");
+	if(InForm.arzh.value == "")  arzh = 0;
+	else arzh = eval(InForm.arzh.value);
+	if(InForm.arzh1.value == "1") arzh1 =  (58.3/3600)*Math.pow(arzh , 1/2);
+	else arzh1 = (1/60+45.6/3600)*Math.pow(arzh, 1/2);
+	if(InForm.mbar.value == "") mbar = 0;
+	else mbar = eval(InForm.mbar.value)
+	if(InForm.tempc.value == "") tempc = 0;
+	else tempc = eval(InForm.tempc.value)
+	if(InForm.delta.value == "") deltaT = 0;
+		else deltaT = eval(InForm.delta.value);
+		hr26 = hour26;
+		mnt26 = minute26;
+		secd26 = second26;
+		Tdelta=deltaT;
+		if(InForm.arzm.value == "")  arzm = 0;
+		else arzm = eval(InForm.arzm.value);
+		if(InForm.toolm.value == "")  toolm = 0;
+		else toolm= eval(InForm.toolm.value);
+		if(InForm.ddir.value == "")  ddir = 0;
+		else ddir = eval(InForm.ddir.value);
+		if(InForm.amsec.value == "")  amsec = 0;
+		else amsec = eval(InForm.amsec.value);
+		ref90 = ref12(tempc,mbar,90);
+	}
+}
+
+
+
+// Calculating Julian date, century, and millennium
+//function TimeMeasures()
+
+
+//Nutation, obliquity of the ecliptic
+//function Nutation()
+
+
+
+//GHA Aries, GAST, GMST, equation of the equinoxes
+//function Aries()
+
+
+
+//Calculations for the sun
+//function Sun()
+
+
+
+//Calculation of ephemerides for the moon
+//function Moon()
+
+
+
+//Ephemerides of Polaris
+//function Polaris()
+
+
+//Calculation of the phase of the moon
+//function MoonPhase()
+
+
+//Day of the week
+//function Weekday()
+function tadel(a,b)
+{
+	with(Math)
+	{
+ var c = Math.abs(a-b);
+ if (b > a ) var inrt = "(+";
+ else if (b < a ) var inrt = "(-";
+ else var inrt = "(";
+}
+return  inrt =  inrt+Math.round(c)+"km/h)";
+}
+
+
+function dataF(y11,m11,d11,h11,m12,s11,d12)
+{
+{
+with(document)
+	{
+	
+		year = y11;
+		month = m11;
+		day = d11;
+		hour = h11
+		minute = m12;
+		second = s11;
+	dayfraction = (hour + minute/60 + second/3600)/24;		
+		deltaT = d12;
+	}
+}
+
+
+//TimeMeasures();
+{
+with(Math)
+	{
+	//Julian day (UT1)
+	if(month <= 2) {year -=1; month += 12;}
+	var A = floor(year/100);
+	var B = 2-A+floor(A/4);
+	JD0h = floor(365.25*(year+4716))+floor(30.6001*(month+1))+day+B-1524.5;
+	JD = JD0h+dayfraction;
+	
+	//Julian centuries (GMT) since 2000 January 0.5
+	T = (JD-2451545)/36525;
+	T2 = T*T;
+	T3 = T*T2;
+	T4 = T*T3;
+	T5 = T*T4;
+
+	//Julian ephemeris day (TDT)
+	JDE = JD+deltaT/86400;
+
+	//Julian centuries (TDT) from 2000 January 0.5
+	TE = (JDE-2451545)/36525;
+	TE2 = TE*TE;
+	TE3 = TE*TE2;
+	TE4 = TE*TE3;
+	TE5 = TE*TE4;
+
+	//Julian millenniums (TDT) from 2000 January 0.5
+	Tau = 0.1*TE;
+	Tau2 = Tau*Tau;
+	Tau3 = Tau*Tau2;
+	Tau4 = Tau*Tau3;
+	Tau5 = Tau*Tau4;
+	}
+}
+
+
+//Nutation();
+{
+  //IAU 1980 nutation theory:
+  
+  //Mean anomaly of the moon
+  var Mm = 134.962981389+198.867398056*TE+norm_360_deg(477000*TE)+0.008697222222*TE2+TE3/56250;
+  
+  //Mean anomaly of the sun
+  var M = 357.527723333+359.05034*TE+norm_360_deg(35640*TE)-0.0001602777778*TE2-TE3/300000;
+  
+  //Mean distance of the moon from the ascending node
+  var F = 93.271910277+82.017538055*TE+norm_360_deg(483120*TE)-0.0036825*TE2+TE3/327272.7273;
+  
+  //Mean elongation of the moon
+  var D = 297.850363055+307.11148*TE+norm_360_deg(444960*TE)-0.001914166667*TE2+TE3/189473.6842;
+   
+  //Longitude of the ascending node of the moon
+  var omega = 125.044522222-134.136260833*TE-norm_360_deg(1800*TE)+0.002070833333*TE2+TE3/450000;
+
+  //Periodic terms for nutation
+  var nut = new Array(106);
+  nut[0]  = " 0 0 0 0 1-171996-174.2 92025 8.9 ";     
+  nut[1]  = " 0 0 2-2 2 -13187  -1.6  5736-3.1 ";     
+  nut[2]  = " 0 0 2 0 2  -2274  -0.2   977-0.5 ";     
+  nut[3]  = " 0 0 0 0 2   2062   0.2  -895 0.5 ";     
+  nut[4]  = " 0-1 0 0 0  -1426   3.4    54-0.1 ";     
+  nut[5]  = " 1 0 0 0 0    712   0.1    -7 0.0 ";     
+  nut[6]  = " 0 1 2-2 2   -517   1.2   224-0.6 ";     
+  nut[7]  = " 0 0 2 0 1   -386  -0.4   200 0.0 ";     
+  nut[8]  = " 1 0 2 0 2   -301   0.0   129-0.1 ";     
+  nut[9]  = " 0-1 2-2 2    217  -0.5   -95 0.3 ";     
+  nut[10] = "-1 0 0 2 0    158   0.0    -1 0.0 ";     
+  nut[11] = " 0 0 2-2 1    129   0.1   -70 0.0 ";     
+  nut[12] = "-1 0 2 0 2    123   0.0   -53 0.0 ";     
+  nut[13] = " 1 0 0 0 1     63   0.1   -33 0.0 ";     
+  nut[14] = " 0 0 0 2 0     63   0.0    -2 0.0 ";     
+  nut[15] = "-1 0 2 2 2    -59   0.0    26 0.0 ";     
+  nut[16] = "-1 0 0 0 1    -58  -0.1    32 0.0 ";     
+  nut[17] = " 1 0 2 0 1    -51   0.0    27 0.0 ";     
+  nut[18] = "-2 0 0 2 0    -48   0.0     1 0.0 ";     
+  nut[19] = "-2 0 2 0 1     46   0.0   -24 0.0 ";    
+  nut[20] = " 0 0 2 2 2    -38   0.0    16 0.0 ";     
+  nut[21] = " 2 0 2 0 2    -31   0.0    13 0.0 ";     
+  nut[22] = " 2 0 0 0 0     29   0.0    -1 0.0 ";     
+  nut[23] = " 1 0 2-2 2     29   0.0   -12 0.0 ";     
+  nut[24] = " 0 0 2 0 0     26   0.0    -1 0.0 ";     
+  nut[25] = " 0 0 2-2 0    -22   0.0     0 0.0 ";     
+  nut[26] = "-1 0 2 0 1     21   0.0   -10 0.0 ";     
+  nut[27] = " 0 2 0 0 0     17  -0.1     0 0.0 ";     
+  nut[28] = " 0 2 2-2 2    -16   0.1     7 0.0 ";     
+  nut[29] = "-1 0 0 2 1     16   0.0    -8 0.0 ";     
+  nut[30] = " 0 1 0 0 1    -15   0.0     9 0.0 ";     
+  nut[31] = " 1 0 0-2 1    -13   0.0     7 0.0 ";     
+  nut[32] = " 0-1 0 0 1    -12   0.0     6 0.0 ";     
+  nut[33] = " 2 0-2 0 0     11   0.0     0 0.0 ";     
+  nut[34] = "-1 0 2 2 1    -10   0.0     5 0.0 ";     
+  nut[35] = " 1 0 2 2 2     -8   0.0     3 0.0 ";     
+  nut[36] = " 0-1 2 0 2     -7   0.0     3 0.0 ";     
+  nut[37] = " 0 0 2 2 1     -7   0.0     3 0.0 ";     
+  nut[38] = " 1 1 0-2 0     -7   0.0     0 0.0 ";     
+  nut[39] = " 0 1 2 0 2      7   0.0    -3 0.0 ";     
+  nut[40] = "-2 0 0 2 1     -6   0.0     3 0.0 ";     
+  nut[41] = " 0 0 0 2 1     -6   0.0     3 0.0 ";     
+  nut[42] = " 2 0 2-2 2      6   0.0    -3 0.0 ";     
+  nut[43] = " 1 0 0 2 0      6   0.0     0 0.0 ";     
+  nut[44] = " 1 0 2-2 1      6   0.0    -3 0.0 ";     
+  nut[45] = " 0 0 0-2 1     -5   0.0     3 0.0 ";     
+  nut[46] = " 0-1 2-2 1     -5   0.0     3 0.0 ";     
+  nut[47] = " 2 0 2 0 1     -5   0.0     3 0.0 ";     
+  nut[48] = " 1-1 0 0 0      5   0.0     0 0.0 ";     
+  nut[49] = " 1 0 0-1 0     -4   0.0     0 0.0 ";     
+  nut[50] = " 0 0 0 1 0     -4   0.0     0 0.0 ";     
+  nut[51] = " 0 1 0-2 0     -4   0.0     0 0.0 ";     
+  nut[52] = " 1 0-2 0 0      4   0.0     0 0.0 ";     
+  nut[53] = " 2 0 0-2 1      4   0.0    -2 0.0 ";     
+  nut[54] = " 0 1 2-2 1      4   0.0    -2 0.0 ";     
+  nut[55] = " 1 1 0 0 0     -3   0.0     0 0.0 ";     
+  nut[56] = " 1-1 0-1 0     -3   0.0     0 0.0 ";     
+  nut[57] = "-1-1 2 2 2     -3   0.0     1 0.0 ";     
+  nut[58] = " 0-1 2 2 2     -3   0.0     1 0.0 ";     
+  nut[59] = " 1-1 2 0 2     -3   0.0     1 0.0 ";     
+  nut[60] = " 3 0 2 0 2     -3   0.0     1 0.0 ";     
+  nut[61] = "-2 0 2 0 2     -3   0.0     1 0.0 ";     
+  nut[62] = " 1 0 2 0 0      3   0.0     0 0.0 ";     
+  nut[63] = "-1 0 2 4 2     -2   0.0     1 0.0 ";     
+  nut[64] = " 1 0 0 0 2     -2   0.0     1 0.0 ";     
+  nut[65] = "-1 0 2-2 1     -2   0.0     1 0.0 ";     
+  nut[66] = " 0-2 2-2 1     -2   0.0     1 0.0 ";     
+  nut[67] = "-2 0 0 0 1     -2   0.0     1 0.0 ";     
+  nut[68] = " 2 0 0 0 1      2   0.0    -1 0.0 ";     
+  nut[69] = " 3 0 0 0 0      2   0.0     0 0.0 ";     
+  nut[70] = " 1 1 2 0 2      2   0.0    -1 0.0 ";     
+  nut[71] = " 0 0 2 1 2      2   0.0    -1 0.0 ";     
+  nut[72] = " 1 0 0 2 1     -1   0.0     0 0.0 ";     
+  nut[73] = " 1 0 2 2 1     -1   0.0     1 0.0 ";     
+  nut[74] = " 1 1 0-2 1     -1   0.0     0 0.0 ";     
+  nut[75] = " 0 1 0 2 0     -1   0.0     0 0.0 ";    
+  nut[76] = " 0 1 2-2 0     -1   0.0     0 0.0 ";     
+  nut[77] = " 0 1-2 2 0     -1   0.0     0 0.0 ";     
+  nut[78] = " 1 0-2 2 0     -1   0.0     0 0.0 ";     
+  nut[79] = " 1 0-2-2 0     -1   0.0     0 0.0 ";     
+  nut[80] = " 1 0 2-2 0     -1   0.0     0 0.0 ";     
+  nut[81] = " 1 0 0-4 0     -1   0.0     0 0.0 ";     
+  nut[82] = " 2 0 0-4 0     -1   0.0     0 0.0 ";     
+  nut[83] = " 0 0 2 4 2     -1   0.0     0 0.0 ";     
+  nut[84] = " 0 0 2-1 2     -1   0.0     0 0.0 ";     
+  nut[85] = "-2 0 2 4 2     -1   0.0     1 0.0 ";     
+  nut[86] = " 2 0 2 2 2     -1   0.0     0 0.0 ";     
+  nut[87] = " 0-1 2 0 1     -1   0.0     0 0.0 ";    
+  nut[88] = " 0 0-2 0 1     -1   0.0     0 0.0 ";     
+  nut[89] = " 0 0 4-2 2      1   0.0     0 0.0 ";     
+  nut[90] = " 0 1 0 0 2      1   0.0     0 0.0 ";     
+  nut[91] = " 1 1 2-2 2      1   0.0    -1 0.0 ";     
+  nut[92] = " 3 0 2-2 2      1   0.0     0 0.0 ";     
+  nut[93] = "-2 0 2 2 2      1   0.0    -1 0.0 ";     
+  nut[94] = "-1 0 0 0 2      1   0.0    -1 0.0 ";     
+  nut[95] = " 0 0-2 2 1      1   0.0     0 0.0 ";     
+  nut[96] = " 0 1 2 0 1      1   0.0     0 0.0 ";     
+  nut[97] = "-1 0 4 0 2      1   0.0     0 0.0 ";     
+  nut[98] = " 2 1 0-2 0      1   0.0     0 0.0 ";     
+  nut[99] = " 2 0 0 2 0      1   0.0     0 0.0 ";     
+  nut[100]= " 2 0 2-2 1      1   0.0    -1 0.0 ";     
+  nut[101]= " 2 0-2 0 1      1   0.0     0 0.0 ";     
+  nut[102]= " 1-1 0-2 0      1   0.0     0 0.0 ";     
+  nut[103]= "-1 0 0 1 1      1   0.0     0 0.0 ";     
+  nut[104]= "-1-1 0 2 1      1   0.0     0 0.0 ";     
+  nut[105]= " 0 1 0 1 0      1   0.0     0 0.0 ";  
+      
+   //Reading periodic terms
+   var fMm, fM, fF, fD, f_omega, dp=0, de=0;
+   
+   for (x=0; x<105; x++)
+   {
+      fMm = eval(nut[x].substring(0,2));
+      fM = eval(nut[x].substring(2,4));
+      fF = eval(nut[x].substring(4,6));
+      fD = eval(nut[x].substring(6,8));
+      f_omega = eval(nut[x].substring(8,10));
+      dp += (eval(nut[x].substring(10,17))+TE*eval(nut[x].substring(17,23)))*sind(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega);
+      de   += (eval(nut[x].substring(23,29))+TE*eval(nut[x].substring(29,33)))*cosd(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega);
+   }
+   
+   //Corrections (Herring, 1987)
+   /*
+   var corr = new Array(4);
+   corr[0] = " 0 0 0 0 1-725 417 213 224 ";
+   corr[1] = " 0 1 0 0 0 523  61 208 -24 ";
+   corr[2] = " 0 0 2-2 2 102-118 -41 -47 ";
+   corr[3] = " 0 0 2 0 2 -81   0  32   0 ";
+   
+   for (x=0; x<4; x++)
+   {
+      fMm = eval(corr[x].substring(0,2));
+      fM = eval(corr[x].substring(2,4));
+      fF = eval(corr[x].substring(4,6));
+      fD = eval(corr[x].substring(6,8));
+      f_omega = eval(corr[x].substring(8,10));
+      dp += 0.1*(eval(corr[x].substring(10,14))*sind(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega)+eval(corr[x].substring(14,18))*cosd(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega));
+      de += 0.1*(eval(corr[x].substring(18,22))*cosd(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega)+eval(corr[x].substring(22,26))*sind(fD*D+fM*M+fMm*Mm+fF*F+f_omega*omega));
+   }
+   */
+      
+   //Nutation in longitude
+   delta_psi = dp/36000000;
+   
+   //Nutation in obliquity
+   delta_eps = de/36000000;
+   
+   //Mean obliquity of the ecliptic
+   eps0 = (84381.448-46.815*TE-0.00059*TE2+0.001813*TE3)/3600;
+   
+   //True obliquity of the ecliptic
+   eps = eps0+delta_eps;
+}
+
+//Aries();
+{
+//Mean GHA Aries
+var GHAAmean = norm_360_deg(280.46061837+ 360.98564736629*(JD-2451545)+0.000387933*T2-T3/38710000);
+
+//GMST
+SidTm = OutSidTime(GHAAmean);
+
+//True GHA Aries
+GHAAtrue = norm_360_deg(GHAAmean+delta_psi*cosd(eps));
+
+//GAST
+SidTa = OutSidTime(GHAAtrue);
+
+//Equation of the equinoxes
+EoE = 240*delta_psi*cosd(eps);
+EoEout = Math.round(1000*EoE)/1000;
+EoEout = " "+EoEout+"s";
+}
+//Sun();
+{
+with(Math)
+	{
+	//Periodic terms for the sun
+	//Longitude
+	var L0=175347046;
+	L0+=3341656*cos(4.6692568+6283.0758500*Tau);
+	L0+=34894*cos(4.62610+12566.15170*Tau);
+	L0+=3497*cos(2.7441+5753.3849*Tau);
+	L0+=3418*cos(2.8289+3.5231*Tau);
+	L0+=3136*cos(3.6277+77713.7715*Tau);
+	L0+=2676*cos(4.4181+7860.4194*Tau);
+	L0+=2343*cos(6.1352+3930.2097*Tau);
+	L0+=1324*cos(0.7425+11506.7698*Tau);
+	L0+=1273*cos(2.0371+529.6910*Tau);
+
+	L0+=1199*cos(1.1096+1577.3435*Tau);
+	L0+=990*cos(5.233+5884.927*Tau);
+	L0+=902*cos(2.045+26.298*Tau);
+	L0+=857*cos(3.508+398.149*Tau);
+	L0+=780*cos(1.179+5223.694*Tau);
+	L0+=753*cos(2.533+5507.553*Tau);
+	L0+=505*cos(4.583+18849.228*Tau);
+	L0+=492*cos(4.205+775.523*Tau);
+	L0+=357*cos(2.920+0.067*Tau);
+	L0+=317*cos(5.849+11790.629*Tau);
+
+	L0+=284*cos(1.899+796.298*Tau);
+	L0+=271*cos(0.315+10977.079*Tau);
+	L0+=243*cos(0.345+5486.778*Tau);
+	L0+=206*cos(4.806+2544.314*Tau);
+	L0+=205*cos(1.869+5573.143*Tau);
+	L0+=202*cos(2.458+6069.777*Tau);
+	L0+=156*cos(0.833+213.299*Tau);
+	L0+=132*cos(3.411+2942.463*Tau);
+	L0+=126*cos(1.083+20.775*Tau);
+	L0+=115*cos(0.645+0.980*Tau);
+
+	L0+=103*cos(0.636+4694.003*Tau);
+	L0+=102*cos(0.976+15720.839*Tau);
+	L0+=102*cos(4.267+7.114*Tau);
+	L0+=99*cos(6.21+2146.17*Tau);
+	L0+=98*cos(0.68+155.42*Tau);
+	L0+=86*cos(5.98+161000.69*Tau);
+	L0+=85*cos(1.30+6275.96*Tau);
+	L0+=85*cos(3.67+71430.70*Tau);
+	L0+=80*cos(1.81+17260.15*Tau);
+	L0+=79*cos(3.04+12036.46*Tau);
+
+	L0+=75*cos(1.76+5088.63*Tau);
+	L0+=74*cos(3.50+3154.69*Tau);
+	L0+=74*cos(4.68+801.82*Tau);
+	L0+=70*cos(0.83+9437.76*Tau);
+	L0+=62*cos(3.98+8827.39*Tau);
+	L0+=61*cos(1.82+7084.90*Tau);
+	L0+=57*cos(2.78+6286.60*Tau);
+	L0+=56*cos(4.39+14143.50*Tau);
+	L0+=56*cos(3.47+6279.55*Tau);
+	L0+=52*cos(0.19+12139.55*Tau);
+
+	L0+=52*cos(1.33+1748.02*Tau);
+	L0+=51*cos(0.28+5856.48*Tau);
+	L0+=49*cos(0.49+1194.45*Tau);
+	L0+=41*cos(5.37+8429.24*Tau);
+	L0+=41*cos(2.40+19651.05*Tau);
+	L0+=39*cos(6.17+10447.39*Tau);
+	L0+=37*cos(6.04+10213.29*Tau);
+	L0+=37*cos(2.57+1059.38*Tau);
+	L0+=36*cos(1.71+2352.87*Tau);
+	L0+=36*cos(1.78+6812.77*Tau);
+
+	L0+=33*cos(0.59+17789.85*Tau);
+	L0+=30*cos(0.44+83996.85*Tau);
+	L0+=30*cos(2.74+1349.87*Tau);
+	L0+=25*cos(3.16+4690.48*Tau);
+
+	
+	var L1=628331966747;
+	L1+=206059*cos(2.678235+6283.075850*Tau);
+	L1+=4303*cos(2.6351+12566.1517*Tau);
+	L1+=425*cos(1.590+3.523*Tau);
+	L1+=119*cos(5.796+26.298*Tau);
+	L1+=109*cos(2.966+1577.344*Tau);
+	L1+=93*cos(2.59+18849.23*Tau);
+	L1+=72*cos(1.14+529.69*Tau);
+	L1+=68*cos(1.87+398.15*Tau);
+	L1+=67*cos(4.41+5507.55*Tau);
+
+	L1+=59*cos(2.89+5223.69*Tau);
+	L1+=56*cos(2.17+155.42*Tau);
+	L1+=45*cos(0.40+796.30*Tau);
+	L1+=36*cos(0.47+775.52*Tau);
+	L1+=29*cos(2.65+7.11*Tau);
+	L1+=21*cos(5.34+0.98*Tau);
+	L1+=19*cos(1.85+5486.78*Tau);
+	L1+=19*cos(4.97+213.30*Tau);
+	L1+=17*cos(2.99+6275.96*Tau);
+	L1+=16*cos(0.03+2544.31*Tau);
+
+	L1+=16*cos(1.43+2146.17*Tau);
+	L1+=15*cos(1.21+10977.08*Tau);
+	L1+=12*cos(2.83+1748.02*Tau);
+	L1+=12*cos(3.26+5088.63*Tau);
+	L1+=12*cos(5.27+1194.45*Tau);
+	L1+=12*cos(2.08+4694.00*Tau);
+	L1+=11*cos(0.77+553.57*Tau);
+	L1+=10*cos(1.30+6286.60*Tau);
+	L1+=10*cos(4.24+1349.87*Tau);
+	L1+=9*cos(2.70+242.73*Tau);
+
+	L1+=9*cos(5.64+951.72*Tau);
+	L1+=8*cos(5.30+2352.87*Tau);
+	L1+=6*cos(2.65+9437.76*Tau);
+	L1+=6*cos(4.67+4690.48*Tau);
+
+	
+	var L2=52919;
+	L2+=8720*cos(1.0721+6283.0758*Tau);
+	L2+=309*cos(0.867+12566.152*Tau);
+	L2+=27*cos(0.05+3.52*Tau);
+	L2+=16*cos(5.19+26.30*Tau);
+	L2+=16*cos(3.68+155.42*Tau);
+	L2+=10*cos(0.76+18849.23*Tau);
+	L2+=9*cos(2.06+77713.77*Tau);
+	L2+=7*cos(0.83+775.52*Tau);
+	L2+=5*cos(4.66+1577.34*Tau);
+
+	L2+=4*cos(1.03+7.11*Tau);
+	L2+=4*cos(3.44+5573.14*Tau);
+	L2+=3*cos(5.14+796.30*Tau);
+	L2+=3*cos(6.05+5507.55*Tau);
+	L2+=3*cos(1.19+242.73*Tau);
+	L2+=3*cos(6.12+529.69*Tau);
+	L2+=3*cos(0.31+398.15*Tau);
+	L2+=3*cos(2.28+553.57*Tau);
+	L2+=2*cos(4.38+5223.69*Tau);
+	L2+=2*cos(3.75+0.98*Tau);
+
+	
+	var L3=289*cos(5.844+6283.076*Tau);
+	L3+=35;
+	L3+=17*cos(5.49+12566.15*Tau);
+	L3+=3*cos(5.20+155.42*Tau);
+	L3+=1*cos(4.72+3.52*Tau);
+	L3+=1*cos(5.30+18849.23*Tau);
+	L3+=1*cos(5.97+242.73*Tau);
+
+	
+	var L4=114*cos(3.142);
+	L4+=8*cos(4.13+6283.08*Tau);
+	L4+=1*cos(3.84+12566.15*Tau);
+
+		
+	var L5 = 1*cos(3.14);
+	
+	//Mean longitude of the sun
+	var Lsun_mean = norm_360_deg(280.4664567+360007.6982779*Tau+0.03032028*Tau2+Tau3/49931-Tau4/15299-Tau5/1988000);
+	
+	//Heliocentric longitude
+	var Lhelioc = norm_360_deg((L0+L1*Tau+L2*Tau2+L3*Tau3+L4*Tau4+L5*Tau5)/1e8/dtr);
+	
+	//Geocentric longitude
+	Lsun_true = norm_360_deg(Lhelioc+180-0.000025);
+	
+	//Latitude
+	var B0=280*cos(3.199+84334.662*Tau);
+	B0+=102*cos(5.422+5507.553*Tau);
+	B0+=80*cos(3.88+5223.69*Tau);
+	B0+=44*cos(3.70+2352.87*Tau);
+	B0+=32*cos(4.00+1577.34*Tau);
+	
+	var B1=9*cos(3.90+5507.55*Tau);
+	B1+=6*cos(1.73+5223.69*Tau);
+
+	//Heliocentric latitude
+	var B = (B0+B1*Tau)/1e8/dtr;
+	
+	//Geocentric latitude
+	var beta = norm_360_deg(-B);
+	
+	//Corrections
+	Lsun_prime = norm_360_deg(Lhelioc+180-1.397*TE-0.00031*TE2);
+	
+	beta = beta+0.000011*(cosd(Lsun_prime)-sind(Lsun_prime));
+
+
+	//Distance earth-sun
+	var R0=100013989;
+	R0+=1670700*cos(3.0984635+6283.0758500*Tau);
+	R0+=13956*cos(3.05525+12566.15170*Tau);
+	R0+=3084*cos(5.1985+77713.7715*Tau);
+	R0+=1628*cos(1.1739+5753.3849*Tau);
+	R0+=1576*cos(2.8469+7860.4194*Tau);
+	R0+=925*cos(5.453+11506.770*Tau);
+	R0+=542*cos(4.564+3930.210*Tau);
+	R0+=472*cos(3.661+5884.927*Tau);
+	R0+=346*cos(0.964+5507.553*Tau);
+
+	R0+=329*cos(5.900+5223.694*Tau);
+	R0+=307*cos(0.299+5573.143*Tau);
+	R0+=243*cos(4.273+11790.629*Tau);
+	R0+=212*cos(5.847+1577.344*Tau);
+	R0+=186*cos(5.022+10977.079*Tau);
+	R0+=175*cos(3.012+18849.228*Tau);
+	R0+=110*cos(5.055+5486.778*Tau);
+	R0+=98*cos(0.89+6069.78*Tau);
+	R0+=86*cos(5.69+15720.84*Tau);
+	R0+=86*cos(1.27+161000.69*Tau);
+
+	R0+=65*cos(0.27+17260.15*Tau);
+	R0+=63*cos(0.92+529.69*Tau);
+	R0+=57*cos(2.01+83996.85*Tau);
+	R0+=56*cos(5.24+71430.70*Tau);
+	R0+=49*cos(3.25+2544.31*Tau);
+	R0+=47*cos(2.58+775.52*Tau);
+	R0+=45*cos(5.54+9437.76*Tau);
+	R0+=43*cos(6.01+6275.96*Tau);
+	R0+=39*cos(5.36+4694.00*Tau);
+	R0+=38*cos(2.39+8827.39*Tau);
+
+	R0+=37*cos(0.83+19651.05*Tau);
+	R0+=37*cos(4.90+12139.55*Tau);
+	R0+=36*cos(1.67+12036.46*Tau);
+	R0+=35*cos(1.84+2942.46*Tau);
+	R0+=33*cos(0.24+7084.90*Tau);
+	R0+=32*cos(0.18+5088.63*Tau);
+	R0+=32*cos(1.78+398.15*Tau);
+	R0+=28*cos(1.21+6286.60*Tau);
+	R0+=28*cos(1.90+6279.55*Tau);
+	R0+=26*cos(4.59+10447.39*Tau);
+
+	
+	var R1=103019*cos(1.107490+6283.075850*Tau);
+	R1+=1721*cos(1.0644+12566.1517*Tau);
+	R1+=702*cos(3.142);
+	R1+=32*cos(1.02+18849.23*Tau);
+	R1+=31*cos(2.84+5507.55*Tau);
+	R1+=25*cos(1.32+5223.69*Tau);
+	R1+=18*cos(1.42+1577.34*Tau);
+	R1+=10*cos(5.91+10977.08*Tau);
+	R1+=9*cos(1.42+6275.96*Tau);
+	R1+=9*cos(0.27+5486.78*Tau);
+
+	
+	var R2=4359*cos(5.7846+6283.0758*Tau);
+	R2+=124*cos(5.579+12566.152*Tau);
+	R2+=12*cos(3.14);
+	R2+=9*cos(3.63+77713.77*Tau);
+	R2+=6*cos(1.87+5573.14*Tau);
+	R2+=3*cos(5.47+18849.23*Tau);
+
+	
+	var R3=145*cos(4.273+6283.076*Tau);
+	R3+=7*cos(3.92+12566.15*Tau);
+	
+
+	var R4 = 4*cos(2.56+6283.08*Tau);
+	
+	R = (R0+R1*Tau+R2*Tau2+R3*Tau3+R4*Tau4)/1e8;
+
+
+	//Apparent longitude of the sun
+	lambda = norm_360_deg(Lsun_true+delta_psi-0.005691611/R);
+	
+	//Right ascension of the sun, apparent
+	RAsun = norm_360_deg(atan2((sind(lambda)*cosd(eps)-tand(beta)*sind(eps)),cosd(lambda))/dtr);
+	
+	//Sidereal hour angle of the sun, apparent
+	SHAsun = 360-RAsun;
+
+	//Declination of the sun, apparent 
+	DECsun = asin(sind(beta)*cosd(eps)+cosd(beta)*sind(eps)*sind(lambda))/dtr;
+	Dsun = DECsun;
+
+	//GHA of the sun
+	GHAsun = norm_360_deg(GHAAtrue-RAsun);
+		
+	//Semidiameter of the sun
+	SDsun = 959.63/R;
+
+	//Horizontal parallax of the sun
+	HPsun = 8.794/R;
+
+	//Equation of time
+	//EOT = 4*(Lsun_mean-0.0057183-0.0008-RAsun+delta_psi*cosd(eps));
+	EOT = 4*GHAsun+720-1440*dayfraction;
+	if (EOT>20) EOT-=1440;
+	if (EOT<-20) EOT+=1440;
+	}
+}
+EOTs = eot(GHAsun);
+//Moon();
+{
+with (Math)
+	{
+	// Mean longitude of the moon
+	Lmoon_mean = norm_360_deg(218.3164591+481267.88134236*TE-0.0013268*TE2+TE3/538841-TE4/65194000);
+
+	//Mean elongation of the moon
+	D = norm_360_deg(297.8502042+445267.1115168*TE-0.00163*TE2+TE3/545868-TE4/113065000);
+
+	// Mean anomaly of the sun
+	Msun_mean = norm_360_deg(357.5291092+35999.0502909*TE-0.0001536*TE2+TE3/24490000);
+
+	//Mean anomaly of the moon
+	Mmoon_mean = norm_360_deg(134.9634114+477198.8676313*TE+0.008997*TE2+TE3/69699-TE4/14712000);
+
+	//Mean distance of the moon from her ascending node
+	F = norm_360_deg(93.2720993+483202.0175273*TE-0.0034029*TE2-TE3/3526000+TE4/863310000);
+
+	//Corrections
+	A1 =119.75+131.849*TE;
+	A1 = 360*(A1/360 - floor(A1/360));
+	A2 = 53.09+479264.29*TE;
+	A2 = 360*(A2/360 - floor(A2/360));
+	A3 = 313.45+481266.484*TE;
+	A3 = 360*(A3/360 - floor(A3/360));
+
+	fE = 1-0.002516*TE-0.0000074*TE2;
+	fE2 = fE*fE;
+
+	
+	//Periodic terms for the moon
+
+	//Longitude and distance
+	fD = new Array(60);
+	fMms = new Array(60);
+	fMmm = new Array(60);
+	fF = new Array(60);
+	coeffs = new Array(60);
+	coeffc = new Array(60);
+
+	fD[0]=0; fMms[0]=0; fMmm[0]=1; fF[0]=0; coeffs[0]=6288774; coeffc[0]=-20905355;
+	fD[1]=2; fMms[1]=0; fMmm[1]=-1; fF[1]=0; coeffs[1]=1274027; coeffc[1]=-3699111;
+	fD[2]=2; fMms[2]=0; fMmm[2]=0; fF[2]=0; coeffs[2]=658314; coeffc[2]=-2955968;
+	fD[3]=0; fMms[3]=0; fMmm[3]=2; fF[3]=0; coeffs[3]=213618; coeffc[3]=-569925;
+	fD[4]=0; fMms[4]=1; fMmm[4]=0; fF[4]=0; coeffs[4]=-185116; coeffc[4]=48888;
+	fD[5]=0; fMms[5]=0; fMmm[5]=0; fF[5]=2; coeffs[5]=-114332; coeffc[5]=-3149;
+	fD[6]=2; fMms[6]=0; fMmm[6]=-2; fF[6]=0; coeffs[6]=58793; coeffc[6]=246158;
+	fD[7]=2; fMms[7]=-1; fMmm[7]=-1; fF[7]=0; coeffs[7]=57066; coeffc[7]=-152138;
+	fD[8]=2; fMms[8]=0; fMmm[8]=1; fF[8]=0; coeffs[8]=53322; coeffc[8]=-170733;
+	fD[9]=2; fMms[9]=-1; fMmm[9]=0; fF[9]=0; coeffs[9]=45758; coeffc[9]=-204586;
+
+	fD[10]=0; fMms[10]=1; fMmm[10]=-1; fF[10]=0; coeffs[10]=-40923; coeffc[10]=-129620;
+	fD[11]=1; fMms[11]=0; fMmm[11]=0; fF[11]=0; coeffs[11]=-34720; coeffc[11]=108743;
+	fD[12]=0; fMms[12]=1; fMmm[12]=1; fF[12]=0; coeffs[12]=-30383; coeffc[12]=104755;
+	fD[13]=2; fMms[13]=0; fMmm[13]=0; fF[13]=-2; coeffs[13]=15327; coeffc[13]=10321;
+	fD[14]=0; fMms[14]=0; fMmm[14]=1; fF[14]=2; coeffs[14]=-12528; coeffc[14]=0;
+	fD[15]=0; fMms[15]=0; fMmm[15]=1; fF[15]=-2; coeffs[15]=10980; coeffc[15]=79661;
+	fD[16]=4; fMms[16]=0; fMmm[16]=-1; fF[16]=0; coeffs[16]=10675; coeffc[16]=-34782;
+	fD[17]=0; fMms[17]=0; fMmm[17]=3; fF[17]=0; coeffs[17]=10034; coeffc[17]=-23210;
+	fD[18]=4; fMms[18]=0; fMmm[18]=-2; fF[18]=0; coeffs[18]=8548; coeffc[18]=-21636;
+	fD[19]=2; fMms[19]=1; fMmm[19]=-1; fF[19]=0; coeffs[19]=-7888; coeffc[19]=24208;
+
+	fD[20]=2; fMms[20]=1; fMmm[20]=0; fF[20]=0; coeffs[20]=-6766; coeffc[20]=30824;
+	fD[21]=1; fMms[21]=0; fMmm[21]=-1; fF[21]=0; coeffs[21]=-5163; coeffc[21]=-8379;
+	fD[22]=1; fMms[22]=1; fMmm[22]=0; fF[22]=0; coeffs[22]=4987; coeffc[22]=-16675;
+	fD[23]=2; fMms[23]=-1; fMmm[23]=1; fF[23]=0; coeffs[23]=4036; coeffc[23]=-12831;
+	fD[24]=2; fMms[24]=0; fMmm[24]=2; fF[24]=0; coeffs[24]=3994; coeffc[24]=-10445;
+	fD[25]=4; fMms[25]=0; fMmm[25]=0; fF[25]=0; coeffs[25]=3861; coeffc[25]=-11650;
+	fD[26]=2; fMms[26]=0; fMmm[26]=-3; fF[26]=0; coeffs[26]=3665; coeffc[26]=14403;
+	fD[27]=0; fMms[27]=1; fMmm[27]=-2; fF[27]=0; coeffs[27]=-2689; coeffc[27]=-7003;
+	fD[28]=2; fMms[28]=0; fMmm[28]=-1; fF[28]=2; coeffs[28]=-2602; coeffc[28]=0;
+	fD[29]=2; fMms[29]=-1; fMmm[29]=-2; fF[29]=0; coeffs[29]=2390; coeffc[29]=10056;
+
+	fD[30]=1; fMms[30]=0; fMmm[30]=1; fF[30]=0; coeffs[30]=-2348; coeffc[30]=6322;
+	fD[31]=2; fMms[31]=-2; fMmm[31]=0; fF[31]=0; coeffs[31]=2236; coeffc[31]=-9884;
+	fD[32]=0; fMms[32]=1; fMmm[32]=2; fF[32]=0; coeffs[32]=-2120; coeffc[32]=5751;
+	fD[33]=0; fMms[33]=2; fMmm[33]=0; fF[33]=0; coeffs[33]=-2069; coeffc[33]=0;
+	fD[34]=2; fMms[34]=-2; fMmm[34]=-1; fF[34]=0; coeffs[34]=2048; coeffc[34]=-4950;
+	fD[35]=2; fMms[35]=0; fMmm[35]=1; fF[35]=-2; coeffs[35]=-1773; coeffc[35]=4130;
+	fD[36]=2; fMms[36]=0; fMmm[36]=0; fF[36]=2; coeffs[36]=-1595; coeffc[36]=0;
+	fD[37]=4; fMms[37]=-1; fMmm[37]=-1; fF[37]=0; coeffs[37]=1215; coeffc[37]=-3958;
+	fD[38]=0; fMms[38]=0; fMmm[38]=2; fF[38]=2; coeffs[38]=-1110; coeffc[38]=0;
+	fD[39]=3; fMms[39]=0; fMmm[39]=-1; fF[39]=0; coeffs[39]=-892; coeffc[39]=3258;
+
+	fD[40]=2; fMms[40]=1; fMmm[40]=1; fF[40]=0; coeffs[40]=-810; coeffc[40]=2616;
+	fD[41]=4; fMms[41]=-1; fMmm[41]=-2; fF[41]=0; coeffs[41]=759; coeffc[41]=-1897;
+	fD[42]=0; fMms[42]=2; fMmm[42]=-1; fF[42]=0; coeffs[42]=-713; coeffc[42]=-2117;
+	fD[43]=2; fMms[43]=2; fMmm[43]=-1; fF[43]=0; coeffs[43]=-700; coeffc[43]=2354;
+	fD[44]=2; fMms[44]=1; fMmm[44]=-2; fF[44]=0; coeffs[44]=691; coeffc[44]=0;
+	fD[45]=2; fMms[45]=-1; fMmm[45]=0; fF[45]=-2; coeffs[45]=596; coeffc[45]=0;
+	fD[46]=4; fMms[46]=0; fMmm[46]=1; fF[46]=0; coeffs[46]=549; coeffc[46]=-1423;
+	fD[47]=0; fMms[47]=0; fMmm[47]=4; fF[47]=0; coeffs[47]=537; coeffc[47]=-1117;
+	fD[48]=4; fMms[48]=-1; fMmm[48]=0; fF[48]=0; coeffs[48]=520; coeffc[48]=-1571;
+	fD[49]=1; fMms[49]=0; fMmm[49]=-2; fF[49]=0; coeffs[49]=-487; coeffc[49]=-1739;
+
+	fD[50]=2; fMms[50]=1; fMmm[50]=0; fF[50]=-2; coeffs[50]=-399; coeffc[50]=0;
+	fD[51]=0; fMms[51]=0; fMmm[51]=2; fF[51]=-2; coeffs[51]=-381; coeffc[51]=-4421;
+	fD[52]=1; fMms[52]=1; fMmm[52]=1; fF[52]=0; coeffs[52]=351; coeffc[52]=0;
+	fD[53]=3; fMms[53]=0; fMmm[53]=-2; fF[53]=0; coeffs[53]=-340; coeffc[53]=0;
+	fD[54]=4; fMms[54]=0; fMmm[54]=-3; fF[54]=0; coeffs[54]=330; coeffc[54]=0;
+	fD[55]=2; fMms[55]=-1; fMmm[55]=2; fF[55]=0; coeffs[55]=327; coeffc[55]=0;
+	fD[56]=0; fMms[56]=2; fMmm[56]=1; fF[56]=0; coeffs[56]=-323; coeffc[56]=1165;
+	fD[57]=1; fMms[57]=1; fMmm[57]=-1; fF[57]=0; coeffs[57]=299; coeffc[57]=0;
+	fD[58]=2; fMms[58]=0; fMmm[58]=3; fF[58]=0; coeffs[58]=294; coeffc[58]=0;
+	fD[59]=2; fMms[59]=0; fMmm[59]=-1; fF[59]=-2; coeffs[59]=0; coeffc[59]=8752;
+
+	//Latitude
+	fD2 = new Array(60);
+	fMms2= new Array(60);
+	fMmm2 = new Array(60);
+	fF2 = new Array(60);
+	coeffs2 = new Array(60);
+	
+	fD2[0]=0; fMms2[0]=0; fMmm2[0]=0; fF2[0]=1; coeffs2[0]=5128122;
+	fD2[1]=0; fMms2[1]=0; fMmm2[1]=1; fF2[1]=1; coeffs2[1]=280602;
+	fD2[2]=0; fMms2[2]=0; fMmm2[2]=1; fF2[2]=-1; coeffs2[2]=277693;
+	fD2[3]=2; fMms2[3]=0; fMmm2[3]=0; fF2[3]=-1; coeffs2[3]=173237;
+	fD2[4]=2; fMms2[4]=0; fMmm2[4]=-1; fF2[4]=1; coeffs2[4]=55413;
+	fD2[5]=2; fMms2[5]=0; fMmm2[5]=-1; fF2[5]=-1; coeffs2[5]=46271;
+	fD2[6]=2; fMms2[6]=0; fMmm2[6]=0; fF2[6]=1; coeffs2[6]=32573;
+	fD2[7]=0; fMms2[7]=0; fMmm2[7]=2; fF2[7]=1; coeffs2[7]=17198;
+	fD2[8]=2; fMms2[8]=0; fMmm2[8]=1; fF2[8]=-1; coeffs2[8]=9266;
+	fD2[9]=0; fMms2[9]=0; fMmm2[9]=2; fF2[9]=-1; coeffs2[9]=8822;
+
+	fD2[10]=2; fMms2[10]=-1; fMmm2[10]=0; fF2[10]=-1; coeffs2[10]=8216;
+	fD2[11]=2; fMms2[11]=0; fMmm2[11]=-2; fF2[11]=-1; coeffs2[11]=4324;
+	fD2[12]=2; fMms2[12]=0; fMmm2[12]=1; fF2[12]=1; coeffs2[12]=4200;
+	fD2[13]=2; fMms2[13]=1; fMmm2[13]=0; fF2[13]=-1; coeffs2[13]=-3359;
+	fD2[14]=2; fMms2[14]=-1; fMmm2[14]=-1; fF2[14]=1; coeffs2[14]=2463;
+	fD2[15]=2; fMms2[15]=-1; fMmm2[15]=0; fF2[15]=1; coeffs2[15]=2211;
+	fD2[16]=2; fMms2[16]=-1; fMmm2[16]=-1; fF2[16]=-1; coeffs2[16]=2065;
+	fD2[17]=0; fMms2[17]=1; fMmm2[17]=-1; fF2[17]=-1; coeffs2[17]=-1870;
+	fD2[18]=4; fMms2[18]=0; fMmm2[18]=-1; fF2[18]=-1; coeffs2[18]=1828;
+	fD2[19]=0; fMms2[19]=1; fMmm2[19]=0; fF2[19]=1; coeffs2[19]=-1794;
+	
+	fD2[20]=0; fMms2[20]=0; fMmm2[20]=0; fF2[20]=3; coeffs2[20]=-1749;
+	fD2[21]=0; fMms2[21]=1; fMmm2[21]=-1; fF2[21]=1; coeffs2[21]=-1565;
+	fD2[22]=1; fMms2[22]=0; fMmm2[22]=0; fF2[22]=1; coeffs2[22]=-1491;
+	fD2[23]=0; fMms2[23]=1; fMmm2[23]=1; fF2[23]=1; coeffs2[23]=-1475;
+	fD2[24]=0; fMms2[24]=1; fMmm2[24]=1; fF2[24]=-1; coeffs2[24]=-1410;
+	fD2[25]=0; fMms2[25]=1; fMmm2[25]=0; fF2[25]=-1; coeffs2[25]=-1344;
+	fD2[26]=1; fMms2[26]=0; fMmm2[26]=0; fF2[26]=-1; coeffs2[26]=-1335;
+	fD2[27]=0; fMms2[27]=0; fMmm2[27]=3; fF2[27]=1; coeffs2[27]=1107;
+	fD2[28]=4; fMms2[28]=0; fMmm2[28]=0; fF2[28]=-1; coeffs2[28]=1021;
+	fD2[29]=4; fMms2[29]=0; fMmm2[29]=-1; fF2[29]=1; coeffs2[29]=833;
+	
+	fD2[30]=0; fMms2[30]=0; fMmm2[30]=1; fF2[30]=-3; coeffs2[30]=777;
+	fD2[31]=4; fMms2[31]=0; fMmm2[31]=-2; fF2[31]=1; coeffs2[31]=671;
+	fD2[32]=2; fMms2[32]=0; fMmm2[32]=0; fF2[32]=-3; coeffs2[32]=607;
+	fD2[33]=2; fMms2[33]=0; fMmm2[33]=2; fF2[33]=-1; coeffs2[33]=596;
+	fD2[34]=2; fMms2[34]=-1; fMmm2[34]=1; fF2[34]=-1; coeffs2[34]=491;
+	fD2[35]=2; fMms2[35]=0; fMmm2[35]=-2; fF2[35]=1; coeffs2[35]=-451;
+	fD2[36]=0; fMms2[36]=0; fMmm2[36]=3; fF2[36]=-1; coeffs2[36]=439;
+	fD2[37]=2; fMms2[37]=0; fMmm2[37]=2; fF2[37]=1; coeffs2[37]=422;
+	fD2[38]=2; fMms2[38]=0; fMmm2[38]=-3; fF2[38]=-1; coeffs2[38]=421;
+	fD2[39]=2; fMms2[39]=1; fMmm2[39]=-1; fF2[39]=1; coeffs2[39]=-366;
+
+	fD2[40]=2; fMms2[40]=1; fMmm2[40]=0; fF2[40]=1; coeffs2[40]=-351;
+	fD2[41]=4; fMms2[41]=0; fMmm2[41]=0; fF2[41]=1; coeffs2[41]=331;
+	fD2[42]=2; fMms2[42]=-1; fMmm2[42]=1; fF2[42]=1; coeffs2[42]=315;
+	fD2[43]=2; fMms2[43]=-2; fMmm2[43]=0; fF2[43]=-1; coeffs2[43]=302;
+	fD2[44]=0; fMms2[44]=0; fMmm2[44]=1; fF2[44]=3; coeffs2[44]=-283;
+	fD2[45]=2; fMms2[45]=1; fMmm2[45]=1; fF2[45]=-1; coeffs2[45]=-229;
+	fD2[46]=1; fMms2[46]=1; fMmm2[46]=0; fF2[46]=-1; coeffs2[46]=223;
+	fD2[47]=1; fMms2[47]=1; fMmm2[47]=0; fF2[47]=1; coeffs2[47]=223;
+	fD2[48]=0; fMms2[48]=1; fMmm2[48]=-2; fF2[48]=-1; coeffs2[48]=-220;
+	fD2[49]=2; fMms2[49]=1; fMmm2[49]=-1; fF2[49]=-1; coeffs2[49]=-220;
+
+	fD2[50]=1; fMms2[50]=0; fMmm2[50]=1; fF2[50]=1; coeffs2[50]=-185;
+	fD2[51]=2; fMms2[51]=-1; fMmm2[51]=-2; fF2[51]=-1; coeffs2[51]=181;
+	fD2[52]=0; fMms2[52]=1; fMmm2[52]=2; fF2[52]=1; coeffs2[52]=-177;
+	fD2[53]=4; fMms2[53]=0; fMmm2[53]=-2; fF2[53]=-1; coeffs2[53]=176;
+	fD2[54]=4; fMms2[54]=-1; fMmm2[54]=-1; fF2[54]=-1; coeffs2[54]=166;
+	fD2[55]=1; fMms2[55]=0; fMmm2[55]=1; fF2[55]=-1; coeffs2[55]=-164;
+	fD2[56]=4; fMms2[56]=0; fMmm2[56]=1; fF2[56]=-1; coeffs2[56]=132;
+	fD2[57]=1; fMms2[57]=0; fMmm2[57]=-1; fF2[57]=-1; coeffs2[57]=-119;
+	fD2[58]=4; fMms2[58]=-1; fMmm2[58]=0; fF2[58]=-1; coeffs2[58]=115;
+	fD2[59]=2; fMms2[59]=-2; fMmm2[59]=0; fF2[59]=1; coeffs2[59]=107;
+	
+
+	var sumL = 0; var sumr = 0; var sumB = 0;
+
+	for (x=0; x<60; x++)
+	{
+	var f = 1;
+	if(abs(fMms[x])==1) f=fE;
+	if(abs(fMms[x])==2) f=fE2;
+	sumL += f*(coeffs[x]*sind(fD[x]*D+fMms[x]*Msun_mean+fMmm[x]*Mmoon_mean+fF[x]*F));
+	sumr += f*(coeffc[x]*cosd(fD[x]*D+fMms[x]*Msun_mean+fMmm[x]*Mmoon_mean+fF[x]*F));
+	f = 1;
+	if(abs(fMms2[x])==1) f=fE;
+	if(abs(fMms2[x])==2) f=fE2;
+	sumB += f*(coeffs2[x]*sind(fD2[x]*D+fMms2[x]*Msun_mean+fMmm2[x]*Mmoon_mean+fF2[x]*F));
+	}
+
+	//Corrections
+	sumL = sumL+3958*sind(A1)+1962*sind(Lmoon_mean-F)+318*sind(A2);
+	sumB = sumB-2235*sind(Lmoon_mean)+382*sind(A3)+175*sind(A1-F)+175*sind(A1+F)+127*sind(Lmoon_mean-Mmoon_mean)-115*sind(Lmoon_mean+Mmoon_mean);
+	
+	//Longitude of the moon
+	lambdaMm = norm_360_deg(Lmoon_mean+sumL/1000000);
+
+	//Latitude of the moon
+	betaM = sumB/1000000;
+
+	//Distance earth-moon
+	dEM = 385000.56+sumr/1000;
+
+	//Apparent longitude of the moon
+	lambdaMapp = lambdaMm+delta_psi;
+
+	//Right ascension of the moon, apparent
+	RAmoon = norm_360_deg(atan2((sind(lambdaMapp)*cosd(eps)-tand(betaM)*sind(eps)),cosd(lambdaMapp))/dtr);
+
+	//Sidereal hour angle of the moon, apparent
+	SHAmoon = 360-RAmoon;
+
+	//Declination of the moon 
+	DECmoon = asin(sind(betaM)*cosd(eps)+cosd(betaM)*sind(eps)*sind(lambdaMapp))/dtr;
+	Dmoon = DECmoon;
+
+	//GHA of the moon
+	GHAmoon = norm_360_deg(GHAAtrue-RAmoon);
+
+	//Horizontal parallax of the moon
+	HPmoon = 3600*asin(6378.14/dEM)/dtr;
+
+	//Semidiameter of the moon
+	SDmoon = 3600*asin(1738/dEM)/dtr;
+
+	//Geocentric angular distance between moon and sun
+	LDist = acos(sind(Dmoon)*sind(Dsun)+cosd(Dmoon)*cosd(Dsun)*cosd(RAmoon-RAsun))/dtr;
+//RA
+ars= arh(GHAsun);
+arm= arh(GHAmoon);
+// EOTMOON
+	EOTm3 = eot(GHAmoon);
+	EOTm4= eota(GHAmoon);
+	//eot RA
+	teot = eot(GHAAtrue);
+	sGHA = rtg(tools);
+	seot = eot(sGHA);
+	//Phase of the moon
+	var i = lambdaMapp-lambda;
+	k = 100*(1-cosd(i))/2;
+	k = round(10000*k)/10000;
+	}
+}
+
+//Polaris();
+{
+  //Equatorial coordinates of Polaris at 2000.0 (mean equinox and equator 2000.0)
+  var RApol0 = 37.95293333;
+  var DECpol0 = 89.26408889;
+  
+  //Proper motion per year
+  var dRApol = 2.98155/3600;
+  var dDECpol = -0.0152/3600;
+  
+  //Equatorial coordinates at Julian Date T (mean equinox and equator 2000.0)
+  var RApol1 = RApol0+100*TE*dRApol;
+  var DECpol1 = DECpol0+100*TE*dDECpol;
+  
+  //Mean obliquity of ecliptic at 2000.0 in degrees
+  var eps0_2000 = 23.439291111;
+  
+  //Transformation to ecliptic coordinates in radians (mean equinox and equator 2000.0)
+  with(Math)
+  {
+  var lambdapol1 = atan2((sind(RApol1)*cosd(eps0_2000)+tand(DECpol1)*sind(eps0_2000)),cosd(RApol1));
+  var betapol1 = asin(sind(DECpol1)*cosd(eps0_2000)-cosd(DECpol1)*sind(eps0_2000)*sind(RApol1));
+  }
+  
+  //Precession
+  var eta = (47.0029*TE-0.03302*TE2+0.00006*TE3)*dtr/3600;
+  var PI0 = (174.876384-(869.8089*TE+0.03536*TE2)/3600)*dtr;
+  var p0 = (5029.0966*TE+1.11113*TE2-0.0000006*TE3)*dtr/3600;
+  with(Math)
+  {
+  var A1 = cos(eta)*cos(betapol1)*sin(PI0-lambdapol1)-sin(eta)*sin(betapol1);
+  var B1 = cos(betapol1)*cos(PI0-lambdapol1);
+  var C1 = cos(eta)*sin(betapol1)+sin(eta)*cos(betapol1)*sin(PI0-lambdapol1); 
+  var lambdapol2 = p0+PI0-atan2(A1,B1);
+  var betapol2 = asin(C1);  
+  }
+  
+  //Nutation in longitude
+  lambdapol2 += dtr*delta_psi;
+  
+  //Aberration
+  var kappa = dtr*20.49552/3600;
+  pi0 = dtr*(102.93735+1.71953*TE+0.00046*TE2);
+  var e = 0.016708617-0.000042037*TE-0.0000001236*TE2;
+  with(Math)
+  {  
+  dlambdapol = (e*kappa*cos(pi0-lambdapol2)-kappa*cos(dtr*Lsun_true-lambdapol2))/cos(betapol2);
+  dbetapol = -kappa*sin(betapol2)*(sin(dtr*Lsun_true-lambdapol2)-e*sin(pi0-lambdapol2));
+  }
+  lambdapol2 += dlambdapol;
+  betapol2 += dbetapol;
+    
+  //Transformation back to equatorial coordinates in radians
+  with(Math)
+  {
+   var RApol2 =  atan2((sin(lambdapol2)*cosd(eps)-tan(betapol2)*sind(eps)),cos(lambdapol2));
+   var DECpol2 = asin(sin(betapol2)*cosd(eps)+cos(betapol2)*sind(eps)*sin(lambdapol2));
+  }
+  
+  //Finals
+  GHApol = GHAAtrue-RApol2/dtr;
+  GHApol = norm_360_deg(GHApol);
+  SHApol = 360-RApol2/dtr;
+  SHApol = norm_360_deg(SHApol);
+  DECpol = DECpol2/dtr;    
+}
+
+
+//MoonPhase();
+{
+var x = lambdaMapp-lambda;
+x = norm_360_deg(x);
+if(x>0 && x<180) quarter = " (+)";
+if(x>180 && x<360) quarter = " (-)";
+if (k==0) quarter = ", new";
+if (k==100) quarter = ", full";
+}
+//new moon
+tqwm = GHAAtrue - GHAsun;
+if (tqwm<0) tqwm=360+tqwm;
+Ls=Math.acos(cosd(tqwm)*cosd(DECsun))/dtr;
+if (tqwm>180) Ls=360-Ls;
+sea=Math.atan(tand(DECsun)/sind(tqwm))/dtr;
+mtqwm = GHAAtrue - GHAmoon;
+if (mtqwm<0) mtqwm=360+mtqwm;
+mea=Math.asin(sind(DECmoon)*cosd(sea)-cosd(DECmoon)*sind(sea)*sind(mtqwm))/dtr;
+Lm=Math.acos(cosd(mtqwm)*cosd(DECmoon)/cosd(mea))/dtr;
+if (mtqwm>180) Lm=360-Lm;
+
+
+//Weekday();
+{
+JD0h += 1.5;
+var res = JD0h-7*Math.floor(JD0h/7);
+if (res == 0) DoW = " SUN";
+if (res == 1) DoW = " MON";
+if (res == 2) DoW = " TUE";
+if (res == 3) DoW = " WED";
+if (res == 4) DoW = " THU";
+if (res == 5) DoW = " FRI";
+if (res == 6) DoW = " SAT";  
+}
+}
+
+function asrf(a,tm,m,mz,sdz,sda,e,f,t,p,h)
+	{
+with(Math)
+		{
+		foqani=abs(a-mz);
+		if (foqani <sdz) sdz=0;
+		foqanih = foqani - sdz;
+		refz=ref11(t,p,foqanih);
+		foqanim  = foqanih-refz;
+		asrz1= atan(tand(foqanim)+h)/dtr;
+		refa=ref12(t,p,asrz1);
+		asrz2= refa+asrz1+sda;
+		namaz(a,tm,m,asrz2,e,f);
+				}
+	}
+function f24(x)
+{
+with(Math)
+  {
+  if ( x < 0) { f = -1; b = 1;}
+  else { f = 1; b = 0;}
+  a = Math.trunc(abs(x)/24)+b;
+  x = x-f*a*24;
+  }
+  return x;
+  }
+  
+  function mzn ()
+{
+with(Math)
+  {
+	//norf(b,d)
+	//z1=90+r+SD/3600-HP/3600
+	mg1='\r\n'+"Z= 90+"+OutDec(r)+"+" +OutDec(SD/3600)+"-" +OutDec(HP/3600)+" ="+OutDec(z1);
+	
+	}
+	return mg1;
+  
+  }
+  
+function namazf(y,m,d,h,T,z,arz,tool,hi,tc,mb,f,s,x)
+{
+with(Math)
+  {
+  df = amsec/3600;
+if (z==90)   r=ref12(tc,mb,z);
+hr2= h;
+{dataF(y,m,d,h,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if(f<0) ff="-"
+else ff="+"
+if (x==1) hr = f24(hr);
+ mg3=meot(h,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr3=hr; hit=1;}
+if ( Math.abs(hr3-hr2) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg4=meot(hr3,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr4=hr; hit= 2;}
+else {hr4=hr3; mg4="";}
+if ( Math.abs(hr4-hr3) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg5=meot(hr4,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr5 = hr; hit= 3;}
+else {hr5=hr4; mg5="";}
+if ( Math.abs(hr5-hr4) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg6=meot(hr4,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr6 = hr; hit= 4;}
+else{ hr6=hr5; mg6="";}
+if ( Math.abs(hr6-hr5) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg7=meot(hr6,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr7 = hr; hit=5;}
+else {hr7 = hr6;mg7="";}
+if ( Math.abs(hr7-hr6) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg8=meot(hr7,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr8 = hr; hit=6;}
+else {hr8 = hr7;mg8="";}
+if ( Math.abs(hr8-hr7) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg9=meot(hr8,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr9 = hr; hit=7;}
+else{ hr9 = hr8;mg9="";}
+if ( Math.abs(hr8-hr9) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg10=meot(hr9,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr10 = hr; hit=8;}
+else{ hr10 = hr9; mg10="";}
+if ( Math.abs(hr10-hr9) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg11=meot(hr10,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr11 = hr; hit=9;}
+else {hr11 = hr10; mg11="";}
+if ( Math.abs(hr10-hr11) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg12=meot(hr11,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr12 = hr; hit=10;}
+else{ hr12 = hr11; mg12="";}
+if ( Math.abs(hr12-hr11) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg13=meot(hr12,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr13 = hr; hit=11;}
+else{ hr13 = hr12; mg13="";}
+if ( Math.abs(hr12-hr13) > df) {
+dataF(y,m,d,hr,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+if (z==90) z1=90+r+SD/3600-HP/3600+hi;
+else z1=z;
+namaz(arz,tool,DEC,z1,EOT25,f);
+if (x==1) hr = f24(hr);
+mg14=meot(hr13,GHAmoon,GHAsun)+mzn()+'\r\n'+12+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15"+ff+"acos((cos("+OutDec(z1)+")-sin("+OutDec(arz)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arz)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(hr+st1)+'\r\n';
+hr14 = hr; hit=12;}
+else{ hr14 = hr13; mg14="";}
+mg15=time(hr14+st1)+ '\r\n';
+if (s!==1&& f<0) fff="طلوعِ قمر"+'\r\n';
+else if (s!==1&& f>0) fff= "غروبِ قمر"+'\r\n';
+else fff="";
+fff1="چونکہ وقت کا فرق "+amsec+ " سیکنڈز سے زیادہ نہیں، اس لئے مزید حل کرنے کی ضرورت نہیں"+ '\r\n';
+mg1=fff+y+"/"+m+"/"+d+ '\r\n'+mg3+mg4+mg5+mg6+mg7+mg8+mg9+mg10+mg11+mg12+mg13+mg14+mg15+fff1;
+
+}
+}
+function sgn(a,b)
+{
+with(Math)
+  {
+	if (a<0 && b==1 ) sg=OutDec(a)
+	else if (a<0 && b==2 ) sg="-("+OutDec(a)+")";
+	else if (a>=0 && b==2 ) sg="-"+OutDec(a);
+	else sg="+"+OutDec(a);
+	}
+	return sg;
+  
+  }
+  //"Time:"+OutDec(h)+" GHAsun:" +OutDec(GHAsun)+
+  function meot(h,b,d){
+with(Math) {
+	msg1="Time:"+OutDec(st1+h)+" GHAsun:" +OutDec(GHAsun)+" GHAmoon:" +OutDec(GHAmoon)+" EOT sun:"+OutDec(EOTs)+'\r\n';
+	var f = d-b;
+       if (f<-180) var f= "GHAsun-GHAmoon<180 so, (360+"+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+")";
+       else if ( f > 180) var f ="GHAsun-GHAmoon>180 so, ("+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+"-360)";
+       else      var f = "("+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+")";
+	   f=msg1+f+"/15"+ sgn(EOTs,1)+" ="+OutDec(EOT25); 
+	}
+	return f;
+  }
+  //2525
+  function eots(h)
+  {
+  with(Math)
+  {
+  b=GHAmoon;
+  d=loo(h*15)
+  if(h<=-24 || h>24 ) co=" Time:"+OutDec(d/15);
+  else co="";
+  msg1="ST:"+OutDec(st1+h)+" GMT:"+OutDec(h)+" GHAmoon:" +OutDec(GHAmoon)+co+" VS:"+OutDec(h)+ "*15 ="+OutDec(d)+'\r\n';
+  var f = d-b;
+  if (f<-180) var v= "VS-GHAmoon<180 so, (360+"+OutDec(d)+"-"+OutDec(b)+")/15";
+  else if ( f > 180) var v ="VS-GHAmoon>180 so, ("+OutDec(d)+"-"+OutDec(b)+"-360)/15";
+  else  var v = "("+OutDec(d)+"-"+OutDec(b)+")/15";
+  var c = e = norf(b,d)/15;
+  if (c<0) { c +=12; a = " Result<0 so, +12"; g="+12 =";}
+  else { c -=12; a = " Result =>0 so, -12"; g="-12 ="; }
+  f=msg1+v+" ="+OutDec(e)+ a+ '\r\n'+ "EOT: "+OutDec(e)+g+OutDec(c);
+  }
+  return f;
+  }
+  function meot1(h)
+  {
+  with(Math)
+  {
+  d=GHAsun;
+  b=GHAmoon;
+  msg1="Time:"+OutDec(st1+h)+" GHAsun:" +OutDec(GHAsun)+" GHAmoon:" +OutDec(GHAmoon)+" EOT sun:"+OutDec(EOTs)+'\r\n';
+  var f = d-b;
+  if (f<-180) var f= "GHAsun-GHAmoon<180 so, (360+"+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+")";
+  else if ( f > 180) var f ="GHAsun-GHAmoon>180 so, ("+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+"-360)";
+  else      var f = "("+OutDec(GHAsun)+"-"+OutDec(GHAmoon)+")";
+  f=msg1+f+"/15"+ sgn(EOTs,1)+" ="+OutDec(EOT25);
+  
+  }
+  return f;
+  }
+  function edl(h,b)
+  {
+  with(Math)
+  {
+  //b=GHAsun;
+  d=loo(h*15)
+  if(h<=-24 || h>24 ) co=" Time:"+OutDec(d/15);
+  else co="";
+  msg1="ST:"+OutDec(st1+h)+" GMT:"+OutDec(h)+" GHA:" +OutDec(b)+co+" VS:"+OutDec(h)+ "*15 ="+OutDec(d)+'\r\n';
+  var f = d-b;
+  if (f<-180) var v= "VS-GHA<180 so, (360+"+OutDec(d)+"-"+OutDec(b)+")/15";
+  else if ( f > 180) var v ="VS-GHA>180 so, ("+OutDec(d)+"-"+OutDec(b)+"-360)/15";
+  else  var v = "("+OutDec(d)+"-"+OutDec(b)+")/15";
+  var c = e = norf(b,d)/15;
+  if (c<0) { c +=12; a = " Result<0 so, +12"; g="+12 =";}
+  else { c -=12; a = " Result =>0 so, -12"; g="-12 ="; }
+  f=msg1+v+" ="+OutDec(e)+ a+ '\r\n'+ "EOT: "+OutDec(e)+g+OutDec(c);
+  }
+  return f;
+  }
+function ftf(y,m,d,h,T,tool,f,s)
+{
+with(Math)
+  {
+   df = amsec/3600;
+   hr2= h
+   {dataF(y,m,d,h,0,0,T);
+   if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+   else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+   hr = f + EOT25 - tool/15;
+   mg3= eots(h)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+   hr3 = hr; hit=1;}
+   if ( Math.abs(hr2-hr3) > df) {
+   dataF(y,m,d,hr,0,0,T);
+   if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+   else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+   hr = f + EOT25 - tool/15;
+   mg4= eots(hr3)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+   hr4 = hr; hit=2;}
+   else {hr4 = hr3; mg4="";}
+  if ( Math.abs(hr4-hr3) > df) {
+  dataF(y,m,d,hr,0,0,T);
+  if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+  hr = f + EOT25 - tool/15;
+  mg5= meot(hr4,GHAmoon,GHAsun)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+  hr5 = hr; hit=3;}
+  else {hr5 = hr4; mg5="";}
+  if ( Math.abs(hr5-hr4) > df) {
+  dataF(y,m,d,hr,0,0,T);
+  if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+  hr = f + EOT25 - tool/15;
+  mg6= meot(hr5,GHAmoon,GHAsun)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+  hr6 = hr; hit=4;}
+  else {hr6 = hr5; mg6="";}
+  if ( Math.abs(hr6-hr5) > df) {
+  dataF(y,m,d,hr,0,0,T);
+  if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+  hr = f + EOT25 - tool/15;
+  mg7= meot(hr6,GHAmoon,GHAsun)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+  hr7 = hr; hit=5;}
+  else {hr7 = hr6; mg7="";}
+  if ( Math.abs(hr6-hr7) > df) {
+  dataF(y,m,d,hr,0,0,T);
+  if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+  hr = f + EOT25 - tool/15;
+  mg8= meot(hr7,GHAmoon,GHAsun)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+  hr8 = hr; hit=6;}
+  else{ hr8 = hr7; mg8="";}
+ if ( Math.abs(hr8-hr7) > df) {
+ dataF(y,m,d,hr,0,0,T);
+ if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+ else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+ hr = f + EOT25 - tool/15;
+ mg9= meot(hr8,GHAmoon,GHAsun)+'\r\n'+f+sgn(EOT25,1)+sgn(st1,1)+sgn(tool,2)+"/15="+OutDec(hr+st1)+'\r\n';
+ hr9 = hr; hit=7;}
+ else{ hr9 = hr8; mg9="";}
+ if(f==0) mg2="قمر غائیت انحطاط"+'\r\n';
+ else mg2="قمر غائیت ارتفاع"+ '\r\n';
+ mg10=time(hr9+st1)+ '\r\n';
+ fff1="چونکہ وقت کا فرق "+amsec+ " سیکنڈز سے زیادہ نہیں، اس لئے مزید حل کرنے کی ضرورت نہیں"+ '\r\n';
+ mg1=mg2+y+"/"+m+"/"+d+ '\r\n'+mg3+mg4+mg5+mg6+mg7+mg8+mg9+mg10+fff1;
+ } 
+ }
+
+
+ function fdirt (Z,DEC,dir,arz,f)
+ {with(Math)
+ { if (dir <= 180) { var dir = dir-90;}
+ else { var dir = dir-270;}
+ dirf= Z + 2*atan((cosd(DEC)*(tand(dir)+f*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+ }
+ return +dirf;
+ }
+
+function fdt(y,m,d,h,T,st,arz,tool,dir,x,f,s)
+{
+with(Math)
+  {
+  if (dir <= 180) { var dir = dir-90;}
+  else { var dir = dir-270;}
+   df = 0.999/3600;
+   hr2= h+st;
+   {dataF(y,m,d,h,0,0,T);
+   if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+   else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+   hr = 12 + EOT25 +st - tool/15 + 2*Math.atan((cosd(DEC)*(tand(dir)+x*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+   if ( f==1) hr = f24(hr);
+   hr3 = hr; hit=1;}
+   if ( Math.abs(hr2-hr3) > df) {
+   dataF(y,m,d,hr-st,0,0,T);
+   if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+   else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+   hr = 12 + EOT25 +st - tool/15 + 2*Math.atan((cosd(DEC)*(tand(dir)+x*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+   if ( f==1) hr = f24(hr);
+   hr4 = hr; hit=2;}
+   else hr4 = hr3;
+  if ( Math.abs(hr4-hr3) > df) {
+  dataF(y,m,d,hr-st,0,0,T);
+  if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+  hr = 12 + EOT25 +st - tool/15 + 2*Math.atan((cosd(DEC)*(tand(dir)+x*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+  if ( f==1) hr = f24(hr);
+  hr5 = hr; hit=3;}
+  else hr5 = hr4;
+ if ( Math.abs(hr5-hr4) > df) {
+ dataF(y,m,d,hr-st,0,0,T);
+ if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+ else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+ hr = 12 + EOT25 + st - tool/15 + 2*Math.atan((cosd(DEC)*(tand(dir)+x*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+  if ( f==1) hr = f24(hr);
+ hr6 = hr; hit=4;}
+ else hr6 = hr5;
+if ( Math.abs(hr5-hr6) > df) {
+dataF(y,m,d,hr-st,0,0,T);
+if (s==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs;}
+else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3;}
+hr = 12 + EOT25 + st - tool/15 + 2*Math.atan((cosd(DEC)*(tand(dir)+x*pow((pow(tand(dir),2)+pow(sind(arz),2)-pow(cosd(arz),2)*pow(tand(DEC),2)),0.5)))/sind(arz+DEC))/dtr/15;
+if ( f==1) hr = f24(hr);
+hr7 = hr; hit=5;}
+else hr7 = hr6;
+	if (Math.abs(hr7-hr6) > 19 ) hr7= "نہ ممکن"
+   }
+ }
+function zodc(a,f) {
+with(Math) {
+if (f==1) dataF(year26,month26,day26,-st1,0,0,Tdelta);
+a9=nm2=norf(a,Ls);
+if(nm2<0) nm2= 0-nm2; 
+if(nm2<180 && a9>0 ) nm2=360-nm2; 
+a=nm2=nm2*365.25/360;
+dataF(year26,month26,day26+nm2,0,0,0,Tdelta);
+nm2=b=nm2+norf(Ls,a)*365.25/360;
+{i=1;
+for (; Math.abs(a-b)>amsec/24/3600   && i<92  ; ) {
+dataF(year26,month26,day26+b,0,0,0,Tdelta);
+a=b;
+b=b+norf(Ls,a)*365.25/360;
+i++;}
+nm2=b;}
+nm2= nm2+st1/24;
+nm2d=Math.floor(nm2);
+nm2=a7=nm2-nm2d;
+day=day+st1/24;
+a66= disdt(year,month,day)+" "+ time(a7*24)+" "+OutDec(Ls)+ "try="+i;
+}
+return a66;}
+function zloop(a,b,c,d,e,f)
+{
+with(Math)
+  {
+  if(Math.abs(a-b)>amsec/3600) {
+  i = 1;
+  mg1="";
+  //&& Math.abs(a-b)<22
+  for (; Math.abs(a-b)>amsec/3600   && i<92  ; ) {
+  {
+  dataF(year26,month26,day26+f,b,0,0,Tdelta);
+  if (d==1) { SD= SDsun; HP= HPsun; DEC = DECsun; EOT25 = EOTs; hfac = 1;}
+  else if (d==3) { DEC = arzs; SD=0; HP=0; hfac=0; EOT25 = seot;}
+  else { SD = SDmoon; HP = HPmoon; DEC = DECmoon; EOT25= EOTm3; hfac =0; }
+  a = b;
+  if ( e == 1) { b = nmz(108,EOT25,DEC,-1); mg1=2626;}
+  else if ( e == 2) { zen=90+ref90+SD/3600-HP/3600+hfac*arzh1;
+  b = nmz(zen,EOT25,DEC,-1);
+  mg1 +='\r\n'+eots(a)+'\r\n'+ "Rise:12+"+OutDec(st1)+"-"+OutDec(toolb)+"+"+OutDec(EOT25)+"-acos((cos("+OutDec(zen)+")-sin("+OutDec(arzb)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arzb)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(b+st1)+ " (ΔT:"+OutDec( Math.abs(a-b))+")"+'\r\n'+ '\r\n';
+  }
+  else if ( e == 3) {
+  b = c-toolb/15+ EOT25;
+  mg1 += '\r\n'+eots(a)+ '\r\n'+OutDec(c)+"+("+OutDec(st1)+")-("+OutDec(toolb)+")/15+("+OutDec(EOT25)+") ="+OutDec(b+st1)+ " (ΔT:"+OutDec( Math.abs(a-b))+")"+ '\r\n';
+  }
+  else if ( e == 4) { refs=ref12(tempc,mbar,c);
+  zasrs= refs+c+SD/3600;
+  b = nmz(zasrs,EOT25,DEC,1); mg1=2626;}
+  else if ( e == 6) { zen=90+ref90+SD/3600-HP/3600+hfac*arzh1;
+  b = nmz(zen,EOT25,DEC,1);
+  mg1 +='\r\n'+eots(a)+'\r\n'+ "SET:12+"+OutDec(st1)+"-"+OutDec(toolb)+"+"+OutDec(EOT25)+"+acos((cos("+OutDec(zen)+")-sin("+OutDec(arzb)+")sin("+OutDec(DEC)+"))/(cos("+OutDec(arzb)+")cos("+OutDec(DEC)+")))/15 ="+OutDec(b+st1)+ " (ΔT:"+OutDec( Math.abs(a-b))+")"+ '\r\n'+ '\r\n';
+  }
+  else if( e == 7) { b = nmz(102,EOT25,DEC,1); mg1=2626;} 
+  else if( e == 8) { b = nmz(108,EOT25,DEC,1);mg1=2626;}
+  else if(e ==5) { zen=90+ref90+hfac*arzh1;
+  b = nmz(zen,EOT25,DEC,1);
+  mg1 = 2626; }
+  else if ( e == 9) { b = c-toolb/15+ EOT25; mg1=2626;}
+  else b=0;
+  i++; 
+  }
+  hr41 = b;
+  x26 = i;
+  }
+  }
+  else { hr41=b; x26=0; mg1="";}
+  }
+  mg10=time(hr41+st1)+ '\r\n';
+  fff1="چونکہ وقت کا فرق "+amsec+ " سیکنڈز سے زیادہ نہیں، اس لئے مزید حل کرنے کی ضرورت نہیں"+ '\r\n';
+  mg1 +=mg10+fff1;
+  }
+
+function ztime(a,b,c,d,e,f)
+{
+with(Math)
+  {
+  i = 1;
+  OutDec(eval("DECsun".concat(33)));
+  for (; Math.abs(c-b)>amsec/3600 ; ) {
+  {
+  
+ }
+ }}}
+
+function calculation()
+{
+with(Math)
+  {
+ //زوال
+ //if ( am1==3) { hr63 = hr26;}
+dataF(year26,month26,day26,hr26,0,0,Tdelta);
+{DECsun33 = DECsun; EOT33 = EOTs; HP33= HPsun; SD33 = SDsun; GHAsun33=GHAsun;}
+{DECmoon33 = mDECmoon = DECmoon; EOT26 = EOTm3; mHP = mHP33= HPmoon; mSD = mSD33 = SDmoon; GHAmoon33=GHAmoon; }
+{ GHAA33= GHAAtrue; seot33 = seot; }
+hr63 = 12-toolb/15+ EOT33;
+mg2="Date:"+day26+"/"+month26+"/"+year26+" Time:"+OutDec(hr26)+ " EOT sun:"+OutDec(EOT33)+'\r\n';
+mg2 +="12+("+OutDec(st1)+")-("+OutDec(toolb)+")/15+("+OutDec(EOT33)+") ="+OutDec(hr63+st1);
+zloop(hr26,hr63,12,1,3,0);
+zawal = hr41+st1;
+// mmg1=mg2+ '\r\n'+mg1;
+test2 = OutDec(eval("DECsun".concat(33)));
+test = 26+",";
+{DECsun3 = DECsun; EOT3 = EOTs; HP3= HPsun; SD3 = SDsun;}
+{DECsunz = DECsun; EOTsz = EOTs; HPz = HPsun/3600; SDz = sd1= SDsun/3600; }
+//پچھلی رات
+hr62 = hr60 = zawal-st1;
+hr63 = hr62 -12;
+zloop(hr62,hr63,0,1,3,0)
+midn = hr41+st1;
+
+{DECsun2 = DECsun; EOT2 = EOTs; HP2= HPsun; SD2 = SDsun;}
+{DECsunm1 = DECsun; EOTsm1=EOTs; HPm1= HPsun/3600; SDm1= SDsun/3600;}
+//اگلی رات
+hr63 = hr62 + 12;
+zloop(hr62,hr63,24,1,3,0)
+midn2 = hr41+st1;
+{DECsunm2 = DECsun; EOTsm2=EOTs; HPm2= HPsun/3600; SDm2 = SDsun/3600; }
+//تقریبی فجر
+fajarz = nmz(108,EOTsz,DECsunz,-1); hr62 = hr60;
+if (isNaN(fajarz)) { fajarz = nmz(108,EOTsm1,DECsunm1,-1); hr62= midn-st1;}
+//تحقیقی
+if (isFinite(fajarz)) { zloop(hr62,fajarz,12,1,1,0);
+fajar1 = hr41+st1;}
+else fajar1 = midn;
+
+//تقریبی عشاء شافعی
+ishasz = nmz(102,EOTsz,DECsunz,1); hr62 = hr60;
+if ( isNaN(ishasz)) { ishasz = nmz(102,EOTsm2,DECsunm2,1); hr62 = midn2-st1; }
+//تحقیقی
+if ( isFinite(ishasz)) { zloop(hr62,ishasz,12,1,7,0);
+ishas = hr41+st1; }
+else ishas = NaN;
+
+//تقریبی عشاء حنفی
+if ( isFinite(ishas)) {
+ishahz = nmz(108,EOTsz,DECsunz,1); hr62 = hr60;
+if ( isNaN(ishahz)) { ishahz = nmz(108,EOTsm2,DECsunm2,1); hr62 = midn2-st1; }
+if ( isFinite(ishahz)) { zloop(hr62,ishahz,12,1,8,0);
+ishah = hr41+st1; }}
+else ishah = NaN;
+
+//تقریبی طلوع
+hr62= hr60;
+zenz=90+ref90+SDz-HPz+arzh1;
+rsunz = nmz(zenz,EOTsz,DECsunz,-1);
+if (isNaN(rsunz)) {zenz=90+ref90+SDm1-HPm1+arzh1;
+rsunz = nmz(zenz,EOTsm1,DECsunm1,-1); hr62 = midn-st1;}
+//تحقیقی
+if ( isFinite(rsunz)) { zloop(hr62,rsunz,12,1,2,0);
+srise = hr41+st1; }
+else srise = NaN;
+
+//تقریبی غروب
+hr62 = hr60;
+zenz=90+ref90+SDz-HPz+arzh1;
+ssunz = nmz(zenz,EOTsz,DECsunz,1);
+if (isNaN(ssunz)) {zenz=90+ref90+SDm2-HPm2+arzh1;
+ssunz = nmz(zenz,EOTsm2,DECsunm2,1); hr62 = midn2-st1;}
+//تحقیقی
+if ( isFinite(ssunz)) { zloop(hr62,ssunz,12,1,6,0);
+sset1 = hr41+st1; }
+else sset1 = NaN;
+
+emoons = elv(DECmoon,GHAmoon,arzb,toolb,-1);
+LDists = LDist;
+//بہ وقت غروب شمس
+dirs =dirp2p(DECsun,GHAsun,arzb,toolb,-1);
+dirm = dirp2p(DECmoon,GHAmoon,arzb,toolb,-1);
+pos1 = norf(dirs,dirm);
+if (pos1 > 0) pos = "(R ";
+else if (pos1 < 0) pos = "(L ";
+else pos = "( "
+pos = pos+ Math.round(abs(pos1*10))/10+"°) ";
+	
+esuns= elv(DECsun,GHAsun,arzb,toolb,-1);
+mppas = dirp2p(esuns,dirs,emoons,dirm,1)
+with(Math)
+	{
+	//Illumination
+	var illum=quarter+k+"%";
+	}
+millum = illum;
+//بعد سمتی زوال مرئی
+zrz=abs(arzb- DECsunz);
+if (zrz < SDz ) zrz =0;
+if ( zrz!=0 ) { 
+zaz0 = zrz - SDz;
+refz=ref11(tempc,mbar,zaz0);
+zaz = zaz0 - refz; }
+else zaz = 0;
+//تقریبی شافعی
+{asrsz= atan(tand(zaz)+1)/dtr;
+refs=ref12(tempc,mbar,asrsz);
+zasrs= refs+asrsz+SDz;
+tasrsz = nmz(zasrs,EOTsz,DECsunz,1);}
+//تحقیقی شافعی
+hr62 = hr60;
+if ( isFinite(tasrsz)) { zloop(hr62,tasrsz,asrsz,1,4,0);
+asrs = hr41+st1; }
+else asrs = NaN;
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,1);
+dataF(year26,month26,day26,hr,0,0,Tdelta);
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,1);
+dataF(year26,month26,day26,hr,0,0,Tdelta);
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,1);
+asrs1=hr+st1
+//تقریبی حنفی
+{asrhz= atan(tand(zaz)+2)/dtr;
+refh=ref12(tempc,mbar,asrhz);
+zasrh= refh+asrhz+SDz;
+tasrhz = nmz(zasrh,EOTsz,DECsunz,1);}
+//تحقیقی حنفی
+if ( isFinite(tasrhz)) { zloop(hr62,tasrhz,asrhz,1,4,0);
+asrh = hr41+st1; }
+else asrh = NaN;
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,2);
+dataF(year26,month26,day26,hr,0,0,Tdelta);
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,2);
+dataF(year26,month26,day26,hr,0,0,Tdelta);
+asrf(arzb,toolb,DECsun,DECsun,SDsun/3600,SDsun/3600,EOTs,1,tempc,mbar,2);
+asrh1=hr+st1
+//اگلا زوال
+dataF(year26,month26,day26+1,hr26,0,0,Tdelta);
+hr63 = 12-toolb/15+ EOTs;
+zloop(hr26,hr63,12,1,3,1)
+zawal2 = hr41+st1;
+
+//اگلی فجر
+//تقریبی فجر
+fajarz = nmz(108,EOTs,DECsun,-1); hr62 =  zawal2;
+if (isNaN(fajarz)) { fajarz = nmz(108,EOTsm2,DECsunm2,-1); hr62= midn2-st1;}
+//تحقیقی
+if (isFinite(fajarz)) { zloop(hr62,fajarz,12,1,1,1);
+fajar2 = hr41+st1;}
+else fajar2 = midn2;
+
+//گزشتہ زوال
+dataF(year26,month26,day26-1,hr26,0,0,Tdelta);
+hr63 = 12-toolb/15+ EOTs;
+zloop(hr26,hr63,12,1,3,-1)
+zawal0 = hr41+st1;
+//تقریبی غروب گزشتہ
+hr62 = zawal0-st1;
+zenz=90+ref90+SDsun/3600-HPsun/3600+arzh1;
+ssunz = nmz(zenz,EOTs,DECsun,1);
+if (isNaN(ssunz)) {zenz=90+ref90+SDm1-HPm1+arzh1;
+ssunz = nmz(zenz,EOTsm1,DECsunm1,1); hr62 = midn-st1;}
+//تحقیقی
+if ( isFinite(ssunz)) { zloop(hr62,ssunz,12,1,6,-1);
+sset0 = hr41+st1; }
+else sset0 = NaN;
+
+if ((fajar1+sset1)/2 > srise) dahq = (fajar1+sset1)/2;
+else dahq= srise;
+
+//قمر
+//قمر فوقانی 
+{DECmoon=DECmoon33; GHAmoon = GHAmoon33; mSD=mSD33; mHP=mHP33; mEOT=EOT26; }
+mhr63 = 12-toolb/15+ EOT26;
+mg2="قمر غائیت ارتفاع"+ '\r\n'+"Date:"+day26+"/"+month26+"/"+year26+'\r\n'+eots(hr26)+ '\r\n';
+mg2 +="12+("+OutDec(st1)+")-("+OutDec(toolb)+")/15+("+OutDec(EOT26)+") ="+OutDec(mhr63+st1)+ " (ΔT:"+OutDec( Math.abs(mhr63-hr26))+")";
+zloop(hr26,mhr63,12,2,3,0);
+{mGHAmoon2 = GHAmoon; DECmoon2 = DECmoon; mEOT2 = EOTm3 ; mHP2 = HPmoon; mSD2 = SDmoon;}
+fmoon=mzawal = hr92 = hr41+st1;
+mmg1=mg2+ '\r\n'+mg1;
+
+//قمر تحتانی گزشتہ
+{mhr63 = mzawal-st1; mEOT=mEOT2;}
+if (am1==3)  { mhr63=hr26; mEOT=EOT26; }
+mg1='\r\n'+"قمر غائیت انحطاط"+ '\r\n'+"Date:"+day26+"/"+month26+"/"+year26+'\r\n'+"Time:"+OutDec(mhr63+st1)+" M EOT:"+OutDec(mEOT)+ '\r\n';
+tmoon=0-toolb/15+mEOT;
+mg1 +="Lower Transit:"+"0+"+OutDec(st1)+"-"+OutDec(toolb)+"/15+"+OutDec(mEOT)+" ="+OutDec(tmoon+st1)+ " (ΔT:"+OutDec( Math.abs(mhr63-tmoon))+")"+ '\r\n';
+mmg2= mg1;
+zloop(mhr63,tmoon,0,2,3,0)
+{mGHAmoon1 = GHAmoon; DECmoon1 = DECmoon; mEOT1 = EOTm3; mHP1 = HPmoon; mSD1 = SDmoon;}
+mmg2 +=mg1;
+tmoon=mmidn = hr41+st1;
+
+//قمر تحتانی اگلی
+{mhr63 = mzawal-st1; mEOT=mEOT2;}
+if (am1==3)  { mhr63=hr26; mEOT=EOT26; }
+mg1='\r\n'+"قمر غائیت انحطاط اگلی"+ '\r\n'+"Date:"+day26+"/"+month26+"/"+year26+'\r\n'+"Time:"+OutDec(mhr63+st1)+" M EOT:"+OutDec(mEOT)+ '\r\n';
+tmoon2=24-toolb/15+mEOT;
+mg1 +="Lower Transit:"+"24+"+OutDec(st1)+"-"+OutDec(toolb)+"/15+"+OutDec(mEOT)+" ="+OutDec(tmoon2+st1)+ " (ΔT:"+OutDec( Math.abs(mhr63-tmoon2))+")"+ '\r\n';
+mmg3= mg1;
+zloop(mhr63,tmoon2,24,2,3,0)
+{mGHAmoon3 = GHAmoon; DECmoon3 = DECmoon; mEOT3 = EOTm3; mHP3 = HPmoon; mSD3 = SDmoon;}
+mmg3 +=mg1;
+tmoon2=mmidn2 = hr41+st1;
+
+//طلوع قمر و غروب
+//قمر set
+mg1 ="غروبِ قمر"+ '\r\n'+"Date:"+day26+"/"+month26+"/"+year26+" Time";
+if(am1==3) { mg1 +=":"; mhr63=hr26; DECmoon=DECmoon33; GHAmoon = GHAmoon33; mSD=mSD33; mHP=mHP33; mEOT=EOT26; }
+else { mg1 +=" Upper Transit:"; mhr63=fmoon-st1; DECmoon = DECmoon2; GHAmoon = mGHAmoon2; mSD=mSD2; mHP=mHP2; mEOT=mEOT2; } 
+mg1 +=OutDec(mhr63+st1)+'\r\n';
+mzenz=90+ref90+mSD/3600-mHP/3600+0*arzh1;
+mg1 +="SD moon:"+OutDec(mSD/3600)+" HP moon:"+ OutDec(mHP/3600)+" DECmoon:"+OutDec(DECmoon)+ '\r\n';
+mg1 += "Z= 90+"+OutDec(ref90)+"+"+OutDec(mSD/3600)+"-"+OutDec(mHP/3600)+" ="+OutDec(mzenz);
+mbz = Math.abs(arzb-DECmoon)
+mbz1 = mbz > mzenz;
+mg1 += '\r\n'+"CS: "+OutDec(arzb)+"-"+OutDec(DECmoon)+" = abs("+OutDec(mbz)+ ") > " +OutDec(mzenz)+ " ["+mbz1+"] ";
+if (mbz1) mg1 +='\r\n'+"Continuous Moon Set";
+else{
+mbt = Math.abs(arzb+DECmoon);
+mbt2= 180-mzenz;
+mbt1 = mbt > mbt2;
+mg1 += '\r\n'+"CR: "+OutDec(arzb)+"+"+OutDec(DECmoon)+" = abs("+OutDec(mbt)+ ") > " +OutDec(mbt2)+" = 180-"+OutDec(mzenz)+" ["+mbt1+"] "+'\r\n';
+if(mbt1 && am1!==3) {
+  { mhr63 = tmoon2-st1; DECmoon = DECmoon3; GHAmoon = mGHAmoon3; mSD=mSD3; mHP=mHP3; mEOT=mEOT3; }
+  mg1 +="Time next Lower Transit:"+OutDec(mhr63+st1)+'\r\n';
+  mzenz =90+ref90+mSD/3600-mHP/3600+0*arzh1;
+  mg1 +="SD moon:"+OutDec(mSD/3600)+" HP moon:"+ OutDec(mHP/3600)+" DECmoon:"+OutDec(DECmoon)+ '\r\n';
+  mg1 += "Z= 90+"+OutDec(ref90)+"+"+OutDec(mSD/3600)+"-"+OutDec(mHP/3600)+" ="+OutDec(mzenz);
+  mbt = arzb+DECmoon;
+  mbt2= 180-mzenz;
+  mbt1 = mbt > mbt2;
+  mg1 += '\r\n'+"CR: "+OutDec(arzb)+"+"+OutDec(DECmoon)+" = abs("+OutDec(mbt)+ ") > " +OutDec(mbt2)+" = 180-"+OutDec(mzenz)+" ["+mbt1+"] "+'\r\n';
+  }
+  //تقریبی set
+  if (!mbt1) {mset = nmz(mzenz,mEOT,DECmoon,1)
+  mg3= mg1 +=  '\r\n'+eots(mhr63)+'\r\n'+"SET:12+"+OutDec(st1)+"-"+OutDec(toolb)+"+"+OutDec(mEOT)+"+acos((cos("+OutDec(mzenz)+")-sin("+OutDec(arzb)+")sin("+OutDec(mDECmoon)+"))/(cos("+OutDec(arzb)+")cos("+OutDec(mDECmoon)+")))/15 ="+OutDec(mset+st1)+ " (ΔT:"+OutDec( Math.abs(mhr63-mset))+")";}
+  else mg3 = mg1 +="Continuous Moon Rise"+'\r\n';
+  //تحقیقی
+  if ( isFinite(mset)) { zloop(mhr63,mset,12,2,6,0);
+  mset = hr41+st1; 
+  mg1 = mg3+'\r\n'+mg1;}
+  else mg1 +='\r\n'+"not possible";
+  }
+mmg4=mg1;
+//namazf(year26,month26,day26,hr26,Tdelta,90,arzb,toolb,0,tempc,mbar,1,2,0)
+//mset =  ( hr14+st1);
+//mmg4=mg1;
+// mgg4=mg1;
+//moon rise
+mg1 ="Moon rise"+ '\r\n'+"Date:"+day26+"/"+month26+"/"+year26+" Time";
+if(am1==3) { mg1 +=":"; mhr63=hr26; DECmoon=DECmoon33; GHAmoon = GHAmoon33; mSD=mSD33; mHP=mHP33; mEOT=EOT26; }
+else { mg1 +=" Upper Transit:"; mhr63=fmoon-st1; DECmoon = DECmoon2; GHAmoon = mGHAmoon2; mSD=mSD2; mHP=mHP2; mEOT=mEOT2; } 
+mg1 +=OutDec(mhr63+st1)+'\r\n';
+mzenz=90+ref90+mSD/3600-mHP/3600+0*arzh1;
+mg1 +="SD moon:"+OutDec(mSD/3600)+" HP moon:"+ OutDec(mHP/3600)+" DECmoon:"+OutDec(DECmoon)+ '\r\n';
+mg1 += "Z= 90+"+OutDec(ref90)+"+"+OutDec(mSD/3600)+"-"+OutDec(mHP/3600)+" ="+OutDec(mzenz);
+mbz = Math.abs(arzb-DECmoon)
+mbz1 = mbz > mzenz;
+mg1 += '\r\n'+"CS: "+OutDec(arzb)+"-"+OutDec(DECmoon)+" = abs("+OutDec(mbz)+ ") > " +OutDec(mzenz)+ " ["+mbz1+"] ";
+if (mbz1) mg1 +='\r\n'+"Continuous Moon Set";
+else{
+mbt = Math.abs(arzb+DECmoon);
+mbt2= 180-mzenz;
+mbt1 = mbt > mbt2;
+mg1 += '\r\n'+"CR: "+OutDec(arzb)+"+"+OutDec(DECmoon)+" = abs("+OutDec(mbt)+ ") > " +OutDec(mbt2)+" = 180-"+OutDec(mzenz)+" ["+mbt1+"] "+'\r\n';
+if(mbt1 && am1!==3) {
+  { mhr63 = tmoon2-st1; DECmoon = DECmoon3; GHAmoon = mGHAmoon3; mSD=mSD3; mHP=mHP3; mEOT=mEOT3; }
+  mg1 +="Time next Lower Transit:"+OutDec(mhr63+st1)+'\r\n';
+  mzenz =90+ref90+mSD/3600-mHP/3600+0*arzh1;
+  mg1 +="SD moon:"+OutDec(mSD/3600)+" HP moon:"+ OutDec(mHP/3600)+" DECmoon:"+OutDec(DECmoon)+ '\r\n';
+  mg1 += "Z= 90+"+OutDec(ref90)+"+"+OutDec(mSD/3600)+"-"+OutDec(mHP/3600)+" ="+OutDec(mzenz);
+  mbt = arzb+DECmoon;
+  mbt2= 180-mzenz;
+  mbt1 = mbt > mbt2;
+  mg1 += '\r\n'+"CR: "+OutDec(arzb)+"+"+OutDec(DECmoon)+" = abs("+OutDec(mbt)+ ") > " +OutDec(mbt2)+" = 180-"+OutDec(mzenz)+" ["+mbt1+"] "+'\r\n';
+  }
+  //تقریبی rise
+  if (!mbt1) {mrise = nmz(mzenz,mEOT,DECmoon,-1)
+  mg3= mg1 +=  '\r\n'+eots(mhr63)+'\r\n'+"12+"+OutDec(st1)+"-"+OutDec(toolb)+"+"+OutDec(mEOT)+"-acos((cos("+OutDec(mzenz)+")-sin("+OutDec(arzb)+")sin("+OutDec(mDECmoon)+"))/(cos("+OutDec(arzb)+")cos("+OutDec(mDECmoon)+")))/15 ="+OutDec(mrise+st1)+ " (ΔT:"+OutDec( Math.abs(mhr63-mrise))+")";}
+  else mg3 = mg1 +="Continuous Moon Rise"+'\r\n';
+  //تحقیقی
+  if ( isFinite(mrise)) { zloop(mhr63,mrise,12,2,2,0);
+  mrise = hr41+st1; 
+  mg1 = mg3+'\r\n'+mg1;}
+  else mg1 +='\r\n'+"not possible";
+  }
+mmg5=mg1;
+
+
+// namazf(year26,month26,day26,hr26,Tdelta,90,arzb,toolb,0,tempc,mbar,-1,2,0)
+// mrise=  (hr14+st1);
+// mgg3=mg1;
+
+dirm2 = dirp2p(DECmoon,GHAmoon,arzb,toolb,-1);
+//function ftf(y,m,d,h,T,tool,f,s)
+// ftf(year26,month26,day26,hr26,Tdelta,toolb,12,2)
+// fmoon =  (hr9+st1);
+// mgg1="";
+//ftf(year26,month26,day26,hr26,Tdelta,toolb,0,2)
+// mgg2="";
+//tmoon =  (hr9+st1);
+fset = mset-sset1;
+//سمت قبلہ و...
+qdir = dirp2p(21.4225,39.826194444444,arzb,toolb,1);
+mdir = dirp2p(24.467524,39.611358,arzb,toolb,1);
+adir = dirp2p(31.775818,35.235761,arzb,toolb,1);
+bdir = dirp2p(33.336437,44.407943, arzb, toolb,1);
+brdir =dirp2p(28.361869,79.408571, arzb, toolb,1);
+fdir =dirp2p(24.894753,67.061414, arzb, toolb,1);
+pdir =dirp2p(arzm,toolm, arzb, toolb,1);
+//فاصلہ
+qds = disp2p(21.4225,39.826194444444,arzb,toolb,1);
+mds = disp2p(24.467524,39.611358,arzb,toolb,1);
+ads = disp2p(31.775818,35.235761,arzb,toolb,1);
+bds = disp2p(33.336437,44.407943, arzb, toolb,1);
+brds =disp2p(28.361869,79.408571, arzb, toolb,1);
+fds = disp2p(24.894753,67.061414, arzb, toolb,1);
+pds = disp2p(arzm,toolm,arzb,toolb,1);
+//سمت قبلہ بہ شمس وقت
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir,1,1,1);
+qdir1s = hr7;
+eqdir1s= elv(DECsun,GHAsun,arzb,toolb,-1);
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir,1,1,1);
+mdir1s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir,1,1,1);
+adir1s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir,1,1,1);
+bdir1s =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir,1,1,1);
+brdir1s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir,1,1,1);
+fdir1s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir,1,1,1);
+pdir1s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir,1,1,1);
+ddir1s = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir,-1,1,1);
+qdir2s = hr7;
+eqdir2s= elv(DECsun,GHAsun,arzb,toolb,-1);
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir,-1,1,1);
+mdir2s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir,-1,1,1);
+adir2s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir,-1,1,1);
+bdir2s =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir,-1,1,1);
+brdir2s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir,-1,1,1);
+fdir2s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir,-1,1,1);
+pdir2s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir,-1,1,1);
+ddir2s = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir-90,1,1,1);
+qdir3s = hr7;
+eqdir3s= elv(DECsun,GHAsun,arzb,toolb,-1);
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir-90,1,1,1);
+mdir3s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir-90,1,1,1);
+adir3s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir-90,1,1,1);
+bdir3s =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir-90,1,1,1);
+brdir3s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir-90,1,1,1);
+fdir3s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir-90,1,1,1);
+pdir3s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir-90,1,1,1);
+ddir3s = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir-90,-1,1,1);
+qdir4s = hr7;
+eqdir4s= elv(DECsun,GHAsun,arzb,toolb,-1);
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir-90,-1,1,1);
+mdir4s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir-90,-1,1,1);
+adir4s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir-90,-1,1,1);
+bdir4s =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir-90,-1,1,1);
+brdir4s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir-90,-1,1,1);
+fdir4s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir-90,-1,1,1);
+pdir4s = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir-90,-1,1,1);
+ddir4s = hr7;
+
+//سمت قبلہ بہ قمر وقت
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir,1,1,2);
+qdir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir,1,1,2);
+mdir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir,1,1,2);
+adir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir,1,1,2);
+bdir1m =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir,1,1,2);
+brdir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir,1,1,2);
+fdir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir,1,1,2);
+pdir1m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir,1,1,2);
+ddir1m = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir,-1,1,2);
+qdir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir,-1,1,2);
+mdir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir,-1,1,2);
+adir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir,-1,1,2);
+bdir2m =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir,-1,1,2);
+brdir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir,-1,1,2);
+fdir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir,-1,1,2);
+pdir2m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir,-1,1,2);
+ddir2m = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir-90,1,1,2);
+qdir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir-90,1,1,2);
+mdir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir-90,1,1,2);
+adir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir-90,1,1,2);
+bdir3m =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir-90,1,1,2);
+brdir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir-90,1,1,2);
+fdir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir-90,1,1,2);
+pdir3m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir-90,1,1,2);
+ddir3m = hr7;
+
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,qdir-90,-1,1,2);
+qdir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,mdir-90,-1,1,2);
+mdir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,adir-90,-1,1,2);
+adir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,bdir-90,-1,1,2);
+bdir4m =hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,brdir-90,-1,1,2);
+brdir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,fdir-90,-1,1,2);
+fdir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,pdir-90,-1,1,2);
+pdir4m = hr7;
+fdt(year26,month26,day26,hr26,Tdelta,st1,arzb,toolb,ddir-90,-1,1,2);
+ddir4m = hr7;
+//Stats set/rise
+GHAAtrue = GHAA33;
+seot = seot33;
+// star upper Transit
+mhr63 = 12-toolb/15+ seot33;
+zloop(hr26,mhr63,12,3,9,0);
+fst = hr41+st1;
+seot22= seot;
+//rise
+zens=90+ref90+0*arzh1;
+rises = nmz(zens,seot,arzs,-1);
+if ( isFinite(rises)) { zloop(fst,rises,12,3,2,0);
+rises = hr41+st1; }
+else rises = NaN;
+//set
+seot = seot22;
+zens=90+ref90+0*arzh1;
+sets = nmz(zens,seot,arzs,1);
+if ( isFinite(sets)) { zloop(fst,sets,12,3,5,0);
+sets = hr41+st1; }
+else sets = NaN;
+//lower Transit
+mhr63 = 0-toolb/15+ seot33;
+zloop(hr26,mhr63,0,3,9,0);
+tst = hr41+st1;
+//next Transit
+mhr63 = 24-toolb/15+ seot33;
+zloop(hr26,mhr63,24,3,9,0);
+tst2 = hr41+st1;
+//duration
+dtst=Math.abs(tst2-tst);
+//new moon
+nm=norf(GHAsun,GHAmoon)
+if(nm<0) nm+=360;
+nm=nm/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+dataF(year26,month26,day26+nm,0,0,0,Tdelta);
+nm=nm+norf(GHAsun,GHAmoon)/12;
+nm=nm+st1/24;
+nmd=Math.floor(nm)
+nm=nm-nmd;
+nm=nmd+"d"+OutDec(nm*24)+" بعد نیا چاند";
+//new moon
+dataF(year26,month26,day26,-st1,0,0,Tdelta);
+a67=Ls;
+a6=nm1=norf(Ls,Lm);
+if(nm1<0) nm1=-nm1;
+if(nm1<180 && a6>0 ) nm1=360-nm1;
+nm1=a=nm1/12;
+dataF(year26,month26,day26+nm1,0,0,0,Tdelta);
+nm1=b=nm1+norf(Lm,Ls)/12;
+{i=1;
+for (; Math.abs(a-b)>amsec/24/3600   && i<92  ; ) {
+dataF(year26,month26,day26+b,0,0,0,Tdelta);
+a=b;
+b=b+norf(Lm,Ls)/12;
+i++;}
+nm1=b;}
+nm1= nm1+st1/24;
+nm1d=Math.floor(nm1);
+nm1=a7=nm1-nm1d;
+nm1=nm1d+"d"+OutDec(nm1*24)+" بعد نیا چاند";
+//a5=nm1;
+//a6=i;
+day=day+st1/24;
+a5= disdt(year,month,day)+" "+ time(a7*24)+" نیا چاند";
+a68=Math.ceil(a67/30)*30;
+if (a68==360) a68=0;
+//sun a68
+dataF(year26,month26,day26,-st1,0,0,Tdelta);
+a9=nm2=norf(a68,Ls);
+if(nm2<0) nm2= 0-nm2; 
+if(nm2<180 && a9>0 ) nm2=360-nm2; 
+a=nm2=nm2*365.25/360;
+dataF(year26,month26,day26+nm2,0,0,0,Tdelta);
+nm2=b=nm2+norf(Ls,a68)*365.25/360;
+{i=1;
+for (; Math.abs(a-b)>amsec/24/3600   && i<92  ; ) {
+dataF(year26,month26,day26+b,0,0,0,Tdelta);
+a=b;
+b=b+norf(Ls,a68)*365.25/360;
+i++;}
+nm2=b;}
+nm2= nm2+st1/24;
+nm2d=Math.floor(nm2);
+nm2=a7=nm2-nm2d;
+day=day+st1/24;
+a66= disdt(year,month,day)+" "+ time(a7*24)+" "+OutDec(Ls)+i;
+
+a68=a68+30;
+if (a68==360) a68=0;
+//sun a68
+//dataF(year26,month26,day26,-st1,0,0,Tdelta);
+a9=nm2=norf(a68,Ls);
+if(nm2<0) nm2= 0-nm2; 
+if(nm2<180 && a9>0 ) nm2=360-nm2; 
+a=nm2=nm2*365.25/360;
+dataF(year26,month26,day26+nm2,0,0,0,Tdelta);
+nm2=b=nm2+norf(Ls,a68)*365.25/360;
+{i=1;
+for (; Math.abs(a-b)>amsec/24/3600   && i<92  ; ) {
+dataF(year26,month26,day26+b,0,0,0,Tdelta);
+a=b;
+b=b+norf(Ls,a68)*365.25/360;
+i++;}
+nm2=b;}
+nm2= nm2+st1/24;
+nm2d=Math.floor(nm2);
+nm2=a7=nm2-nm2d;
+day=day+st1/24;
+a66+= '\r\n'+ disdt(year,month,day)+" "+ time(a7*24)+" "+OutDec(Ls)+i;
+
+}
+}
+//namaz out put
+function Noutput()
+{
+
+
+with(document)
+	{
+	
+
+	ymd0 =(test)+" "+ disdt(year26,month26,day26-1)+ "  گزشتہ دن";
+	ymd = disdt(year26,month26,day26);
+	ymd1 = disdt(year26,month26,day26+1)+ "  اگلا دن";
+
+	msg1=	(ymd)+";arz:"+arzb+";tool:"+toolb+";ST:"+st1+'\r\n'+"مغرب"+ '\r\n'+time(sset1)+'\r\n'+"طلوعِ قمر"+ '\r\n'+time(mrise) + '\r\n'+"غروب قمر" + '\r\n'+time(mset)+ '\r\n'+ "بہ وقتِ غروب شمس"+ '\r\n'+"سمت شمس"+ '\r\n'+OutDec(dirs)+ '\r\n'+"سمت قمر"+ '\r\n'+OutDec(dirm)+ '\r\n'+"فصل غروبین"+ '\r\n'+OutDec(fset)+ '\r\n'+"حقیقی ارتفاع قمر"+ '\r\n'+OutDec(emoons);
+	msg2 =  '\r\n'+"فصل نیرین"+ '\r\n'+OutDec(LDists)+ '\r\n'+"چمک"+ '\r\n'+millum+ '\r\n'+"زاویہ ہلال قمر"+ '\r\n'+ OutDec(mppas)+ '\r\n'+"فرق سمت"+ '\r\n'+pos+ '\r\n'+"سمتِ غروب قمر"+ '\r\n'+OutDec(dirm2)+ '\r\n'+"چاند دورانیہ"+'\r\n'+OutDec(Math.abs(tmoon-tmoon2))+ '\r\n'+a5;
+	msg3 = 	(ymd)+";arz:"+arzb+";tool:"+toolb+";ST:"+st1+ '\r\n';
+	msg4 = "Sunset    Moonset"+ '\r\n';
+	msg5 = tim(sset1)+ "   "+ tim(mset);
+	
+	message.value = a66+ '\r\n'+ msg1+msg2+ '\r\n'+ '\r\n'+mmg1+mmg2+mmg3+ '\r\n'+mmg5+ '\r\n'+mmg4;
+	zawal0 = time(zawal0)+ " گزشتہ زوال";
+	zawal = time(zawal)+ "  زوال";
+	asrh = time(asrh)+ "  عصر حنفی";
+	asrh1 = time(asrh1) + "  تقریبی عصر";
+	asrs = time(asrs) + "  عصر شافعی"
+	asrs1 = time(asrs1) + "  تقریبی عصر"
+	fajar = time(fajar1) + " فجر  ";
+	ishah = time(ishah)+ " عشاء حنفی ";
+	ishas = time(ishas) + " عشاء شافعی ";
+	midn = time(midn)+ " نصف الیل "
+	sset = time(sset1) + " مغرب ";
+	srise =  time(srise) + " طلوع شمس ";
+	midd = time(dahq)+" "+ " ضحوۂ کبرٰی "
+	shari = time(fajar1-(24-sset0+fajar1)/6)+ " مستحب ابتدأ سحری ";
+	sset0 = time(sset0) + " مغرب گزشتہ";
+	shari1 = time(fajar2-(24-sset1+fajar2)/6)+ " مستحب ابتدأ سحری " ;
+	fajar2 = time(fajar2) + " فجر اگلی ";
+	midn2 = time(midn2)+ " نصف الیل اگلی";
+	zawal2 = time(zawal2)+ " اگلا زوال";
+	
+	mrise = time(mrise)+ " طلوعِ قمر";
+	mset = time(mset)+ " غروبِ قمر";
+	fmoon = time(fmoon) + " قمر فوقانی";
+	tmoon = time(tmoon) + " قمر تَحتانی";
+	dirs= OutDec(dirs) +" سمتِ غروب شمس";
+	dirm= OutDec(dirm) +" سمتِ قمر";
+	dirp= pos+ OutDec(mppas) + " ہلال زاویہ";
+	millum= millum + " چمک";
+	fset = OutDec(fset) + " فصل غروبین";
+	emoons = OutDec(emoons) + " حقیقی ارتفاع قمر";
+	LDists = OutDec(LDists) + " فصل نیرین";
+	dirm2 = OutDec(dirm2) + " سمتِ غروب قمر";
+	
+	
+	OutForm.ymd0.value = (ymd0);
+	OutForm.ymd.value = (ymd);
+	OutForm.ymd1.value = (ymd1);
+	OutForm.sset0.value = (sset0);
+	OutForm.zawal0.value = (zawal0);
+	OutForm.zawal.value = (zawal);
+	OutForm.asrh.value = (asrh);
+	OutForm.asrh1.value = (asrh1);	
+	OutForm.asrs.value = (asrs);
+	OutForm.asrs1.value = (asrs1);	
+	OutForm.fajar.value = (fajar);
+	OutForm.ishah.value = (ishah);
+	OutForm.ishas.value = (ishas);
+	OutForm.midn.value = (midn);
+	OutForm.sset.value = (sset);
+	OutForm.srise.value = (srise);
+	OutForm.midd.value = (midd);
+	OutForm.shari.value = (shari);	
+	OutForm.shari1.value = (shari1);	
+	OutForm.fajar2.value = (fajar2);	
+	OutForm.midn2.value = (midn2);	
+	OutForm.zawal2.value = (zawal2);
+	OutForm.ymdm.value = (ymd)+";arz:"+arzb+";tool:"+toolb+";ST:"+st1;
+	OutForm.mrise.value = mrise;
+	OutForm.mset.value = mset;
+	OutForm.fmoon.value = fmoon;
+	OutForm.tmoon.value = tmoon;
+	OutForm.ssetm.value = (sset);
+	OutForm.dirs.value = dirs;
+	OutForm.dirm.value = dirm;
+	OutForm.dirp.value = dirp;
+	OutForm.millum.value = millum;
+	OutForm.fset.value = fset;
+	OutForm.emoons.value = emoons;
+	OutForm.LDists.value = LDists;
+	OutForm.dirm2.value = dirm2;
+	
+	
+OutForm.ymd2.value = (ymd);
+OutForm.qdir.value = OutDec(qdir);
+OutForm.mdir.value = OutDec(mdir);
+OutForm.adir.value = OutDec(adir);
+OutForm.bdir.value = OutDec(bdir);
+OutForm.brdir.value = OutDec(brdir);
+OutForm.fdir.value = OutDec(fdir);
+OutForm.pdir.value = OutDec(pdir);
+OutForm.ddir.value = OutDec(ddir);
+
+OutForm.qds.value = (qds);
+OutForm.mds.value = (mds);
+OutForm.ads.value = (ads);
+OutForm.bds.value = (bds);
+OutForm.brds.value = (brds);
+OutForm.fds.value = (fds);
+OutForm.pds.value = (pds);
+
+OutForm.qdir1s.value = time(qdir1s);
+OutForm.mdir1s.value = time(mdir1s);
+OutForm.adir1s.value = time(adir1s);
+OutForm.bdir1s.value = time(bdir1s);
+OutForm.brdir1s.value = time(brdir1s);
+OutForm.fdir1s.value = time(fdir1s);
+OutForm.pdir1s.value = time(pdir1s);
+OutForm.ddir1s.value = time(ddir1s);
+
+OutForm.qdir2s.value = time(qdir2s);
+OutForm.mdir2s.value = time(mdir2s);
+OutForm.adir2s.value = time(adir2s);
+OutForm.bdir2s.value = time(bdir2s);
+OutForm.brdir2s.value = time(brdir2s);
+OutForm.fdir2s.value = time(fdir2s);
+OutForm.pdir2s.value = time(pdir2s);
+OutForm.ddir2s.value = time(ddir2s);
+
+OutForm.qdir3s.value = time(qdir3s);
+OutForm.mdir3s.value = time(mdir3s);
+OutForm.adir3s.value = time(adir3s);
+OutForm.bdir3s.value = time(bdir3s);
+OutForm.brdir3s.value = time(brdir3s);
+OutForm.fdir3s.value = time(fdir3s);
+OutForm.pdir3s.value = time(pdir3s);
+OutForm.ddir3s.value = time(ddir3s);
+
+OutForm.qdir4s.value = time(qdir4s);
+OutForm.mdir4s.value = time(mdir4s);
+OutForm.adir4s.value = time(adir4s);
+OutForm.bdir4s.value = time(bdir4s);
+OutForm.brdir4s.value = time(brdir4s);
+OutForm.fdir4s.value = time(fdir4s);
+OutForm.pdir4s.value = time(pdir4s);
+OutForm.ddir4s.value = time(ddir4s);
+
+OutForm.qdir1m.value = time(qdir1m);
+OutForm.mdir1m.value = time(mdir1m);
+OutForm.adir1m.value = time(adir1m);
+OutForm.bdir1m.value = time(bdir1m);
+OutForm.brdir1m.value = time(brdir1m);
+OutForm.fdir1m.value = time(fdir1m);
+OutForm.pdir1m.value = time(pdir1m);
+OutForm.ddir1m.value = time(ddir1m);
+
+OutForm.qdir2m.value = time(qdir2m);
+OutForm.mdir2m.value = time(mdir2m);
+OutForm.adir2m.value = time(adir2m);
+OutForm.bdir2m.value = time(bdir2m);
+OutForm.brdir2m.value = time(brdir2m);
+OutForm.fdir2m.value = time(fdir2m);
+OutForm.pdir2m.value = time(pdir2m);
+OutForm.ddir2m.value = time(ddir2m);
+
+OutForm.qdir3m.value = time(qdir3m);
+OutForm.mdir3m.value = time(mdir3m);
+OutForm.adir3m.value = time(adir3m);
+OutForm.bdir3m.value = time(bdir3m);
+OutForm.brdir3m.value = time(brdir3m);
+OutForm.fdir3m.value = time(fdir3m);
+OutForm.pdir3m.value = time(pdir3m);
+OutForm.ddir3m.value = time(ddir3m);
+
+OutForm.qdir4m.value = time(qdir4m);
+OutForm.mdir4m.value = time(mdir4m);
+OutForm.adir4m.value = time(adir4m);
+OutForm.bdir4m.value = time(bdir4m);
+OutForm.brdir4m.value = time(brdir4m);
+OutForm.fdir4m.value = time(fdir4m);
+OutForm.pdir4m.value = time(pdir4m);
+OutForm.ddir4m.value = time(ddir4m);
+
+
+OutForm.fst.value = time(fst)+ " U Transit";
+OutForm.tst.value = time(tst)+ " L Transit";
+OutForm.rises.value = time(rises)+ " Rise";
+OutForm.sets.value = time(sets)+ " Set";
+OutForm.dtst.value = OutDec(dtst)+ " دورانیہ";
+
+	}
+
+	
+	}
+
+// Data output
+function Output()
+{
+ReadData();
+var cdate=new Date();
+var cyear=cdate.getFullYear();
+var cmonth=cdate.getMonth()+1;
+var cday =cdate.getDate(); 
+var chour1= cdate.getHours()-st1;
+var cmin1= cdate.getMinutes();
+var csec1 = cdate.getSeconds();
+var cmi = cdate.getMilliseconds();
+var tzone = cdate.getTimezoneOffset();
+chour= chour1+cmin1/60+(csec1+cmi/1000)/3600;
+if (am1 == 2 || am1 == 3) {cyear= year26; cmonth= month26; cday= day26; chour=dayfraction2;}
+dataF(cyear,cmonth,cday,chour,0,0,deltaT)
+
+//sun
+//	EOTs = EOT/-60
+	EOTc = eot(GHAsun);
+
+
+	// EOTMOON
+ EOTm3 = eot(GHAmoon);
+	//sun direction,dist
+	dirsun =dirp2p(DECsun,GHAsun,arzb,toolb,-1);
+	dirmoon =dirp2p(DECmoon,GHAmoon,arzb,toolb,-1);
+	dirst =dirp2p(arzs,sGHA,arzb,toolb,-1);
+	tdists =disp2p(DECsun,GHAsun,arzb,toolb,-1);
+	tdistm =disp2p(DECmoon,GHAmoon,arzb,toolb,-1);
+	tmdt= disdt(cyear,cmonth,cday)+" "+ time(chour+st1);
+	esun= elv(DECsun,GHAsun,arzb,toolb,-1);
+	emoon = elv(DECmoon,GHAmoon,arzb,toolb,-1);
+	estar = elv(arzs,sGHA,arzb,toolb,-1);
+	mppa = dirp2p(esun,dirsun,emoon,dirmoon,1)
+	sdis = Math.round(R*149597870.7*1000)/1000;
+	mdis= dEM;
+	GHAsc= GHAsun;
+	GHAmc = GHAmoon;
+	GHAac = GHAAtrue;
+	GHArc = sGHA;
+	EOTsc=EOTs;
+	EOTmc= EOTm3;
+	EOTtc= teot;
+	EOTrc= seot;
+
+	if (Ls<30) tqwmb="، حمل";
+	else if (Ls<60) tqwmb="، ثور";
+	else if (Ls<90) tqwmb="، جوزا";
+	else if (Ls<120) tqwmb="، سرطان";
+	else if (Ls<150) tqwmb="، اسد";
+	else if (Ls<180) tqwmb="، سنبلہ";
+	else if (Ls<210) tqwmb="، میزان";
+	else if (Ls<240) tqwmb="، عقرب";
+	else if (Ls<270) tqwmb="، قوس";
+	else if (Ls<300) tqwmb="، جدی";
+	else if (Ls<330) tqwmb="، دلو";
+	else tqwmb="، حوت";
+
+	if (Lm<30) mtqwmb="، حمل";
+	else if (Lm<60) mtqwmb="، ثور";
+	else if (Lm<90) mtqwmb="، جوزا";
+	else if (Lm<120) mtqwmb="، سرطان";
+	else if (Lm<150) mtqwmb="، اسد";
+	else if (Lm<180) mtqwmb="، سنبلہ";
+	else if (Lm<210) mtqwmb="، میزان";
+	else if (Lm<240) mtqwmb="، عقرب";
+	else if (Lm<270) mtqwmb="، قوس";
+	else if (Lm<300) mtqwmb="، جدی";
+	else if (Lm<330) mtqwmb="، دلو";
+	else mtqwmb="، حوت";
+
+
+
+GHAsun =  OutDec(GHAsun) + " GHA";
+SHAsun = OutDec(SHAsun) + " SHA";
+DECsun = OutDec(DECsun) + "میل";
+SDsun = OutDec(SDsun/3600);
+HPsun = OutDec(HPsun/3600);
+dirsun = OutDec(dirsun) +" سمت شمس";
+//Moon
+GHAmoon = OutDec(GHAmoon)+ " GHA";
+SHAmoon = OutDec(SHAmoon)+ " SHA";
+DECmoon = OutDec(DECmoon) +" میل";
+SDmoon = OutDec(SDmoon/3600);
+HPmoon = OutDec(HPmoon/3600);
+dirmoon = OutDec(dirmoon) +" سمت قمر";
+mppa = OutDec(mppa)+ " ہلال قمر زاویہ";
+//Aries
+AR = OutDec(GHAAtrue)+" GHA";
+tqwm = OutDec(tqwm);
+
+//Polaris
+GHApolaris = OutDec(GHApol)+" GHA";
+SHApolaris = OutDec(SHApol);
+DECpolaris = OutDec(DECpol);
+
+
+//Obliquity of Ecliptic
+OoE = OutECL(eps0);
+tOoE = OutECL(eps);
+
+with(Math)
+	{
+
+	//Equation of time
+	if (EOT<0) var sign="+";
+		else var sign="-";
+	EOT = abs(EOT);	
+	var EOTmin = floor(EOT);
+	var EOTsec = round(60000*(EOT-EOTmin))/1000;
+	if (EOTsec-floor(EOTsec)==0) EOTsec+=".0";
+	if (EOTmin==0) EOT = " "+sign+" "+EOTsec+"s";
+		else EOT = ""+sign+"0°"+EOTmin+"’"+EOTsec+"”";
+
+	//Illumination
+	var illum=quarter+k+"%";
+	
+	//Lunar Distance of Sun
+	LDist = OutHA(LDist);
+	}
+
+with(document)
+	{
+if (am1==1) {
+	InForm.year.value= cyear;
+	InForm.month.value= cmonth;
+	InForm.day.value= cday;
+	InForm.hour.value= chour1+st1;
+	InForm.minute.value= cmin1;
+	InForm.second.value= (csec1+ cmi/1000);
+	}
+	OutForm.tmdt.value = tmdt;
+	OutForm.SunGHA.value = GHAsun;
+	OutForm.dirsun.value = dirsun;
+	OutForm.dirst.value = OutDec(dirst)+ " سمت";
+	OutForm.ars.value = time(ars) + " RA";
+	OutForm.SunSHA.value = SHAsun;
+	OutForm.SunDEC.value = DECsun;
+	OutForm.SunSD.value = SDsun;
+	OutForm.SunHP.value = " "+HPsun;
+	OutForm.EOT.value = EOT+ " تعدیل شمس";
+	OutForm.MoonGHA.value = GHAmoon;
+	OutForm.arm.value = time(arm) + " RA";
+	OutForm.MoonSHA.value = SHAmoon;
+	OutForm.MoonDEC.value = DECmoon;
+	OutForm.MoonSD.value = SDmoon;
+	OutForm.MoonHP.value = HPmoon;
+	OutForm.EOTm4.value = OutDec(EOTm4);
+	OutForm.mppa.value = mppa;
+	OutForm.dirmoon.value = dirmoon;
+	OutForm.esun.value = OutDec(esun)+ " ارتفاع";
+	OutForm.estar.value = OutDec(estar)+ " ارتفاع";
+	OutForm.emoon.value = OutDec(emoon)+ " ارتفاع";
+	OutForm.tdists.value ="تحتانی "+ tdists;
+	OutForm.tdistm.value = "تحتانی "+tdistm;
+	OutForm.Moonillum.value = illum;
+	OutForm.Aries.value = AR;
+	OutForm.tqwm.value = tqwm+" RAA";
+	OutForm.Ls.value = OutDec(Ls)+ " تقویم"+tqwmb;
+	OutForm.Lm.value = OutDec(Lm)+ " تقویم"+mtqwmb;
+	OutForm.nm.value = a5+" "+a6
+	OutForm.sea.value = OutDec(sea)+ " SEA";
+	OutForm.mea.value = OutDec(mea)+ " MEA";
+	OutForm.mtqwm.value = OutDec(mtqwm)+" RAA";
+	OutForm.sGHA.value = OutDec(sGHA)+" GHA Star";
+	OutForm.PolarisGHA.value = GHApolaris;
+	OutForm.PolarisSHA.value = SHApolaris;
+	OutForm.PolarisDEC.value = DECpolaris;
+	OutForm.SidTmean.value = SidTm;
+	OutForm.SidTapp.value = SidTa;
+	OutForm.EoEquin.value = EoEout;
+	OutForm.dpsi.value = " "+Math.round(3600000*delta_psi)/1000+"''";
+	OutForm.deps.value = " "+Math.round(3600000*delta_eps)/1000+"''";
+	OutForm.obliq.value = ""+OoE;
+	OutForm.trueobliq.value = ""+tOoE;
+	OutForm.JulianDay.value = " "+Math.round(1000000*JD)/1000000;
+	OutForm.JulianEphemDay.value = " "+Math.round(1000000*JDE)/1000000;
+	OutForm.LunarDist.value = " "+LDist;
+	OutForm.DayOfWeek.value = " "+DoW;
+	eotd.value=tmdt+ '\r\n'+"EOT SUN"+ '\r\n'+edl(dayfraction*24,GHAsc)+ '\r\n'+ '\r\n'+"EOT MOON"+ '\r\n'+edl(dayfraction*24,GHAmc)+ '\r\n'+ '\r\n'+"EOT Aries"+ '\r\n'+edl(dayfraction*24,GHAac)+ '\r\n'+ '\r\n'+"EOT Star  RA:"+time(tools)+ '\r\n'+edl(dayfraction*24,GHArc);
+	dataF(cyear,cmonth,cday,chour-1,0,0,deltaT)
+	sdis1 = Math.round(R*149597870.7*1000)/1000;
+	OutForm.R.value = tadel(sdis1, sdis)+sdis +" Km شمس";
+	OutForm.dEM.value = tadel(dEM,mdis)+ Math.round(mdis*1000)/1000 +  " Km قمر";
+EOTsc1=EOTs;
+EOTmc1= EOTm3;
+EOTtc1= teot;
+EOTrc1= seot;
+	
+	chs=chk(EOTsc,EOTsc1);
+	OutForm.EOTc.value = OutDec(EOTsc)+chs;
+	chm= chk(EOTmc,EOTmc1);
+	OutForm.EOTm3.value = OutDec(EOTmc)+chm;
+	cht= chk(EOTtc,EOTtc1);
+	OutForm.teot.value = OutDec(teot) + cht;
+	chr = chk(EOTrc,EOTrc1);
+	OutForm.seot.value = OutDec(seot)+ chr;
+	}
+if (am1 == 1) {	setTimeout("Output()",100);}
+}
+
+
+</script>
+
+<script type="text/javascript">
+    //  Clear out "sorry, no JavaScript" message from text box.
+    var calcf = document.getElementById("calc");
+    calcf.results.value = "";
+    //  Plug the current year into the year field
+    {
+        var cy = (new Date()).getYear();
+        if (cy < 2000) {
+            cy += 1900;
+        }
+        calcf.year41.value = cy;
+    }
+    gen();
+</script>
+
+
+<script type="text/javascript" >
+
+/*  JavaScript support routines for pacalc.html.  */
+
+	var dfv = ((new Date()).getTimezoneOffset())/-60;
+//calcf.dfv.value = dfv;
+/*  JYEAR  --  Convert  Julian  date  to  year,  month, day, which are
+               returned as an Array.  */
+
+function jyear(td) {
+    var z, f, a, alpha, b, c, d, e, mm;
+
+    td += 0.5;
+    z = Math.floor(td);
+    f = td - z;
+
+    if (z < 2299161.0) {
+        a = z;
+    } else {
+        alpha = Math.floor((z - 1867216.25) / 36524.25);
+        a = z + 1 + alpha - Math.floor(alpha / 4);
+    }
+
+    b = a + 1524;
+    c = Math.floor((b - 122.1) / 365.25);
+    d = Math.floor(365.25 * c);
+    e = Math.floor((b - d) / 30.6001);
+    mm = Math.floor((e < 14) ? (e - 1) : (e - 13));
+
+    return new Array(
+                     Math.floor((mm > 2) ? (c - 4716) : (c - 4715)),
+                     mm,
+                     Math.floor(b - d - Math.floor(30.6001 * e) + f)
+                    );
+}
+
+/*  JHMS  --  Convert Julian time to hour, minutes, and seconds,
+              returned as a three-element array.  */
+
+function jhms(j) {
+    var ij;
+
+    j += 0.5;                 /* Astronomical to civil */
+    ij = (j - Math.floor(j)) * 86400.0;
+    return new Array(
+                     Math.floor(ij / 3600),
+                     Math.floor((ij / 60) % 60),
+                     Math.floor(ij % 60));
+}
+
+/*  DTR  --  Degrees to radians.  */
+
+function fdtr(d)
+{
+    return (d * Math.PI) / 180.0;
+}
+
+/*  FIXANGLE  --  Range reduce angle in degrees.  */
+
+function fixangle(a)
+{
+        return a - 360.0 * (Math.floor((a) / 360.0));
+}
+
+/*  SUMSER  --  Sum the series of periodic terms.  */
+
+function sumser(trig, D, M, F, T, argtab, coeff, tfix, tfixc)
+{
+    var i, j = 0, n = 0, sum = 0, arg, coef;
+
+    D = fdtr(fixangle(D));
+    M = fdtr(fixangle(M));
+    F = fdtr(fixangle(F));
+
+    for (i = 0; coeff[i] != 0.0; i++) {
+        arg = (D * argtab[j]) + (M * argtab[j + 1]) + (F * argtab[j + 2]);
+        j += 3;
+        coef = coeff[i];
+        if (i == tfix[n]) {
+            coef += T * tfixc[n++];
+        }
+        sum += coef * trig(arg);
+    }
+
+    return sum;
+}
+
+/*  We define the perigee and apogee period term arrays statically to
+    avoid re-constructing them on every invocation of moonpa.  */
+
+    var periarg = new Array(
+    /*  D,  M,  F   */
+        2,  0,  0,
+        4,  0,  0,
+        6,  0,  0,
+        8,  0,  0,
+        2, -1,  0,
+        0,  1,  0,
+       10,  0,  0,
+        4, -1,  0,
+        6, -1,  0,
+       12,  0,  0,
+        1,  0,  0,
+        8, -1,  0,
+       14,  0,  0,
+        0,  0,  2,
+        3,  0,  0,
+       10, -1,  0,
+       16,  0,  0,
+       12, -1,  0,
+        5,  0,  0,
+        2,  0,  2,
+       18,  0,  0,
+       14, -1,  0,
+        7,  0,  0,
+        2,  1,  0,
+       20,  0,  0,
+        1,  1,  0,
+       16, -1,  0,
+        4,  1,  0,
+        9,  0,  0,
+        4,  0,  2,
+
+        2, -2,  0,
+        4, -2,  0,
+        6, -2,  0,
+       22,  0,  0,
+       18, -1,  0,
+        6,  1,  0,
+       11,  0,  0,
+        8,  1,  0,
+        4,  0, -2,
+        6,  0,  2,
+        3,  1,  0,
+        5,  1,  0,
+       13,  0,  0,
+       20, -1,  0,
+        3,  2,  0,
+        4, -2,  2,
+        1,  2,  0,
+       22, -1,  0,
+        0,  0,  4,
+        6,  0, -2,
+        2,  1, -2,
+        0,  2,  0,
+        0, -1,  2,
+        2,  0,  4,
+        0, -2,  2,
+        2,  2, -2,
+       24,  0,  0,
+        4,  0, -4,
+        2,  2,  0,
+        1, -1,  0
+    );
+
+    var pericoeff = new Array(
+        -1.6769,
+         0.4589,
+        -0.1856,
+         0.0883,
+        -0.0773,
+         0.0502,
+        -0.0460,
+         0.0422,
+        -0.0256,
+         0.0253,
+         0.0237,
+         0.0162,
+        -0.0145,
+         0.0129,
+        -0.0112,
+        -0.0104,
+         0.0086,
+         0.0069,
+         0.0066,
+        -0.0053,
+        -0.0052,
+        -0.0046,
+        -0.0041,
+         0.0040,
+         0.0032,
+        -0.0032,
+         0.0031,
+        -0.0029,
+         0.0027,
+         0.0027,
+
+        -0.0027,
+         0.0024,
+        -0.0021,
+        -0.0021,
+        -0.0021,
+         0.0019,
+        -0.0018,
+        -0.0014,
+        -0.0014,
+        -0.0014,
+         0.0014,
+        -0.0014,
+         0.0013,
+         0.0013,
+         0.0011,
+        -0.0011,
+        -0.0010,
+        -0.0009,
+        -0.0008,
+         0.0008,
+         0.0008,
+         0.0007,
+         0.0007,
+         0.0007,
+        -0.0006,
+        -0.0006,
+         0.0006,
+         0.0005,
+         0.0005,
+        -0.0004,
+
+        0
+    );
+
+    var peritft = new Array(
+        4,
+        5,
+        7,
+        -1
+    );
+
+    var peritfc = new Array(
+         0.00019,
+        -0.00013,
+        -0.00011
+    );
+
+    var apoarg = new Array(
+    /*  D,  M,  F   */
+        2,  0,  0,
+        4,  0,  0,
+        0,  1,  0,
+        2, -1,  0,
+        0,  0,  2,
+        1,  0,  0,
+        6,  0,  0,
+        4, -1,  0,
+        2,  0,  2,
+        1,  1,  0,
+        8,  0,  0,
+        6, -1,  0,
+        2,  0, -2,
+        2, -2,  0,
+        3,  0,  0,
+        4,  0,  2,
+
+        8, -1,  0,
+        4, -2,  0,
+       10,  0,  0,
+        3,  1,  0,
+        0,  2,  0,
+        2,  1,  0,
+        2,  2,  0,
+        6,  0,  2,
+        6, -2,  0,
+       10, -1,  0,
+        5,  0,  0,
+        4,  0, -2,
+        0,  1,  2,
+       12,  0,  0,
+        2, -1,  2,
+        1, -1,  0
+    );
+
+    var apocoeff = new Array(
+         0.4392,
+         0.0684,
+         0.0456,
+         0.0426,
+         0.0212,
+        -0.0189,
+         0.0144,
+         0.0113,
+         0.0047,
+         0.0036,
+         0.0035,
+         0.0034,
+        -0.0034,
+         0.0022,
+        -0.0017,
+         0.0013,
+
+         0.0011,
+         0.0010,
+         0.0009,
+         0.0007,
+         0.0006,
+         0.0005,
+         0.0005,
+         0.0004,
+         0.0004,
+         0.0004,
+        -0.0004,
+        -0.0004,
+         0.0003,
+         0.0003,
+         0.0003,
+        -0.0003,
+
+        0
+    );
+
+    var apotft = new Array(
+        2,
+        3,
+        -1
+    );
+
+    var apotfc = new Array(
+        -0.00011,
+        -0.00011
+    );
+
+    var periparg = new Array(
+    /*  D,  M,  F   */
+        0,  0,  0,
+        2,  0,  0,
+        4,  0,  0,
+        2, -1,  0,
+        6,  0,  0,
+        1,  0,  0,
+        8,  0,  0,
+        0,  1,  0,
+        0,  0,  2,
+        4, -1,  0,
+        2,  0, -2,
+       10,  0,  0,
+        6, -1,  0,
+        3,  0,  0,
+        2,  1,  0,
+        1,  1,  0,
+       12,  0,  0,
+        8, -1,  0,
+        2,  0,  2,
+        2, -2,  0,
+        5,  0,  0,
+       14,  0,  0,
+
+       10, -1,  0,
+        4,  1,  0,
+       12, -1,  0,
+        4, -2,  0,
+        7,  0,  0,
+        4,  0,  2,
+       16,  0,  0,
+        3,  1,  0,
+        1, -1,  0,
+        6,  1,  0,
+        0,  2,  0,
+       14, -1,  0,
+        2,  2,  0,
+        6, -2,  0,
+        2, -1, -2,
+        9,  0,  0,
+       18,  0,  0,
+        6,  0,  2,
+        0, -1,  2,
+       16, -1,  0,
+        4,  0, -2,
+        8,  1,  0,
+       11,  0,  0,
+        5,  1,  0,
+       20,  0,  0
+    );
+
+    var peripcoeff = new Array(
+      3629.215,
+        63.224,
+        -6.990,
+         2.834,
+         1.927,
+        -1.263,
+        -0.702,
+         0.696,
+        -0.690,
+        -0.629,
+        -0.392,
+         0.297,
+         0.260,
+         0.201,
+        -0.161,
+         0.157,
+        -0.138,
+        -0.127,
+         0.104,
+         0.104,
+        -0.079,
+         0.068,
+
+         0.067,
+         0.054,
+        -0.038,
+        -0.038,
+         0.037,
+        -0.037,
+        -0.035,
+        -0.030,
+         0.029,
+        -0.025,
+         0.023,
+         0.023,
+        -0.023,
+         0.022,
+        -0.021,
+        -0.020,
+         0.019,
+         0.017,
+         0.014,
+        -0.014,
+         0.013,
+         0.012,
+         0.011,
+         0.010,
+        -0.010,
+
+        0
+    );
+
+    var periptft = new Array(
+        3,
+        7,
+        9,
+        -1
+    );
+
+    var periptfc = new Array(
+        -0.0071,
+        -0.0017,
+         0.0016
+    );
+
+    var apoparg = new Array(
+    /*  D,  M,  F   */
+        0,  0,  0,
+        2,  0,  0,
+        1,  0,  0,
+        0,  0,  2,
+        0,  1,  0,
+        4,  0,  0,
+        2, -1,  0,
+        1,  1,  0,
+        4, -1,  0,
+        6,  0,  0,
+        2,  1,  0,
+        2,  0,  2,
+        2,  0, -2,
+        2, -2,  0,
+        2,  2,  0,
+        0,  2,  0,
+        6, -1,  0,
+        8,  0,  0
+    );
+
+    var apopcoeff = new Array(
+      3245.251,
+        -9.147,
+        -0.841,
+         0.697,
+        -0.656,
+         0.355,
+         0.159,
+         0.127,
+         0.065,
+
+         0.052,
+         0.043,
+         0.031,
+        -0.023,
+         0.022,
+         0.019,
+        -0.016,
+         0.014,
+         0.010,
+
+        0
+    );
+
+    var apoptft = new Array(
+        4,
+        -1
+    );
+
+    var apoptfc = new Array(
+         0.0016,
+         -1
+    );
+
+
+/*  MOONPA  --  Calculate perigee or apogee from index number.  */
+
+function moonpa(k)
+{
+    var t, t2, t3, t4, JDE2, D, M, F, par, apogee,
+        EarthRad = 6378.14;
+
+
+    t = k - Math.floor(k);
+    if (t > 0.499 && t < 0.501) {
+        apogee = true;
+    } else if (t > 0.999 || t < 0.001) {
+        apogee = false;
+    } else {
+        abort();
+    }
+
+    t = k / 1325.55;
+    t4 = t * (t3 = t * (t2 = t * t));
+
+    /* Mean time of perigee or apogee */
+    JDE2 = 2451534.6698 + 27.55454989 * k
+                       - 0.0006691 * t2
+                       - 0.000001098 * t3
+                       + 0.0000000052 * t4;
+
+    /* Mean elongation of the Moon */
+    D = 171.9179 + 335.9106046 * k
+                 - 0.0100383 * t2
+                 - 0.00001156 * t3
+                 + 0.000000055 * t4;
+
+    /* Mean anomaly of the Sun */
+    M = 347.3477 + 27.1577721 * k
+                 - 0.0008130 * t2
+                 - 0.0000010 * t3;
+
+    /* Moon's argument of latitude */
+    F = 316.6109 + 364.5287911 * k
+                 - 0.0125053 * t2
+                 - 0.0000148 * t3;
+
+    JDE2 += sumser(Math.sin, D, M, F, t,
+            apogee ? apoarg : periarg, apogee ? apocoeff : pericoeff,
+            apogee ? apotft : peritft, apogee ? apotfc : peritfc);
+    par = sumser(Math.cos, D, M, F, t,
+            apogee ? apoparg : periparg, apogee ? apopcoeff : peripcoeff,
+            apogee ? apoptft : periptft, apogee ? apoptfc : periptfc);
+
+    par = fdtr(par / 3600.0);
+    return new Array(JDE2, par, EarthRad / Math.sin(par));
+}
+
+/*  PAD  --  Pad a string to a given length with a given fill character.  */
+
+function pad(str, howlong, padwith) {
+    var s = str.toString();
+
+    while (s.length < howlong) {
+        s = padwith + s;
+    }
+    return s;
+}
+
+/*  EDATE  --  Edit date and time to application specific format.  */
+
+var Months = new Array( "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                      );
+
+function edate(j) {
+    var date, time;
+
+    j += (30.0 / (24 * 60 * 60));     // Round to nearest minute
+    date = jyear(j);
+    time = jhms(j);
+
+    return Months[date[1] - 1] + " " + pad(date[2], 2, " ") + " " +
+           pad(time[0], 2, " ") + ":" + pad(time[1], 2, "0");
+}
+
+/*  TRUEPHASE  --  Given a K value used to determine the mean phase of
+                   the new moon, and a phase selector (0.0, 0.25, 0.5,
+                   0.75), obtain the true, corrected phase time.  */
+
+function dsin(x) {
+    return Math.sin(fdtr(x));
+}
+
+function dcos(x) {
+    return Math.cos(fdtr(x));
+}
+
+function truephase(k, phase)
+{
+    var t, t2, t3, pt, m, mprime, f,
+        SynMonth = 29.53058868;     /* Synodic month (mean time from new to next new Moon) */
+
+    k += phase;                     /* Add phase to new moon time */
+    t = k / 1236.85;                /* Time in Julian centuries from
+                                       1900 January 0.5 */
+    t2 = t * t;                     /* Square for frequent use */
+    t3 = t2 * t;                    /* Cube for frequent use */
+    pt = 2415020.75933              /* Mean time of phase */
+         + SynMonth * k
+         + 0.0001178 * t2
+         - 0.000000155 * t3
+         + 0.00033 * dsin(166.56 + 132.87 * t - 0.009173 * t2);
+
+    m = 359.2242                    /* Sun's mean anomaly */
+        + 29.10535608 * k
+        - 0.0000333 * t2
+        - 0.00000347 * t3;
+    mprime = 306.0253               /* Moon's mean anomaly */
+        + 385.81691806 * k
+        + 0.0107306 * t2
+        + 0.00001236 * t3;
+    f = 21.2964                     /* Moon's argument of latitude */
+        + 390.67050646 * k
+        - 0.0016528 * t2
+        - 0.00000239 * t3;
+    if ((phase < 0.01) || (Math.abs(phase - 0.5) < 0.01)) {
+
+       /* Corrections for New and Full Moon */
+
+       pt +=     (0.1734 - 0.000393 * t) * dsin(m)
+                + 0.0021 * dsin(2 * m)
+                - 0.4068 * dsin(mprime)
+                + 0.0161 * dsin(2 * mprime)
+                - 0.0004 * dsin(3 * mprime)
+                + 0.0104 * dsin(2 * f)
+                - 0.0051 * dsin(m + mprime)
+                - 0.0074 * dsin(m - mprime)
+                + 0.0004 * dsin(2 * f + m)
+                - 0.0004 * dsin(2 * f - m)
+                - 0.0006 * dsin(2 * f + mprime)
+                + 0.0010 * dsin(2 * f - mprime)
+                + 0.0005 * dsin(m + 2 * mprime);
+    } else if ((abs(phase - 0.25) < 0.01 || (abs(phase - 0.75) < 0.01))) {
+       pt +=     (0.1721 - 0.0004 * t) * dsin(m)
+                + 0.0021 * dsin(2 * m)
+                - 0.6280 * dsin(mprime)
+                + 0.0089 * dsin(2 * mprime)
+                - 0.0004 * dsin(3 * mprime)
+                + 0.0079 * dsin(2 * f)
+                - 0.0119 * dsin(m + mprime)
+                - 0.0047 * dsin(m - mprime)
+                + 0.0003 * dsin(2 * f + m)
+                - 0.0004 * dsin(2 * f - m)
+                - 0.0006 * dsin(2 * f + mprime)
+                + 0.0021 * dsin(2 * f - mprime)
+                + 0.0003 * dsin(m + 2 * mprime)
+                + 0.0004 * dsin(m - 2 * mprime)
+                - 0.0003 * dsin(2 * m + mprime);
+       if (phase < 0.5)
+          /* First quarter correction */
+          pt += 0.0028 - 0.0004 * dcos(m) + 0.0003 * dcos(mprime);
+       else
+          /* Last quarter correction */
+          pt += -0.0028 + 0.0004 * dcos(m) - 0.0003 * dcos(mprime);
+    }
+    return pt;
+}
+
+/*  NEARPHASE  --  Find closest new or full Moon to an apogee or
+                   perigee passage and edit the time difference.  */
+
+function nearphase(jd, phaset) {
+    var i, closest, dt = Number.MAX_VALUE, rs;
+
+    for (i = 0; i < phaset.length; i++) {
+        if (Math.abs(jd - Math.abs(phaset[i])) < dt) {
+            dt = Math.abs(jd - Math.abs(phaset[i]));
+            closest = i;
+        }
+    }
+    rs = (phaset[closest] < 0) ? "N" : "F";
+    rs += (jd > Math.abs(phaset[closest])) ? "+" : "-";
+    if (dt >= 1) {
+        rs += Math.floor(dt) + "d";
+        dt -= Math.floor(dt);
+    } else {
+        rs += "  ";
+    }
+    dt = Math.floor((dt * 86400) / 3600);
+    if (dt < 10) {
+        rs += " ";
+    }
+    rs += dt + "h";
+    return rs;
+}
+
+//  GEN  --  Update the tables when an action button is pressed
+
+function gen() {
+    var v, sk, kr, l, perigee, s, Itemlen = 36,
+        dat, evt, m = 0, epad, pchar, phnear,
+        pmin = Number.MAX_VALUE, pminx = 0,
+        pmax = Number.MIN_VALUE, pmaxx = 0,
+        yrange, centile, TOLERANCE = 0.01, k1, mtime, minx, phaset,
+        Pitemlen = 25;
+
+    var calcf = document.getElementById("calc");
+    window.status = "Calculating..";
+    calcf.results.value = "";
+    year41 = calcf.year41.value;
+    v = "              Perigee           " +
+        "                 Apogee\n" +
+        "---------------------------------" +
+        "   ---------------------------------\n";
+    s = "";
+
+    sk = Math.floor((year41 - 1999.97) * 13.2555);
+    dat = new Array();
+    evt = new Array();
+    phaset = new Array();
+
+    //  Tabulate perigees and apogees for the year
+
+    for (l = 0; true; l++) {
+        kr = moonpa(sk);
+        date = jyear(kr[0]);
+        perigee = (sk - Math.floor(sk)) < .25;
+
+        if (date[0] == year41) {
+            if (kr[2] < pmin) {
+                pmin = kr[2];
+                pminx = m;
+            } else if (kr[2] > pmax) {
+                pmax = kr[2];
+                pmaxx = m;
+            }
+            dat[m] = sk;
+            evt[m++] = kr;
+        }
+        if (date[0] > year41) {
+            break;
+        }
+        sk += 0.5;
+    }
+    yrange = pmax - pmin;
+
+    //  Tabulate new and full moons surrounding the year
+
+    k1 = Math.floor((year41 - 1900) * 12.3685) - 4;
+    minx = 0;
+    for (l = 0; true; l++) {
+        mtime = truephase(k1, (l & 1) * 0.5);
+        date = jyear(mtime);
+        if (date[0] >= year41) {
+            minx++;
+        }
+        phaset[minx] = mtime * ((l & 1) == 0 ? -1 : 1);
+        if (date[0] > year41) {
+            minx++;
+            break;
+        }
+        k1 += l & 1;
+    }
+
+    //  Generate perigee and apogee table
+
+    for (l = 0; l < m; l++) {
+        sk = dat[l];
+        kr = evt[l];
+
+        date = jyear(kr[0]);
+        time = jhms(kr[0]);
+        perigee = (sk - Math.floor(sk)) < .25;
+        if (!perigee && s.length == 0) {
+            s = pad("", Itemlen, " ");
+        }
+        phnear = nearphase(kr[0], phaset);
+        pchar = phnear.charAt(0) == "F" ? "+" : "-";
+        if (l == pminx || l == pmaxx) {
+            epad = pchar + pchar;
+        } else {
+            centile = (kr[2] - pmin) / yrange;
+            if (centile <= TOLERANCE || centile >= (1 - TOLERANCE)) {
+                epad = pchar + " ";
+            } else {
+                epad = "  ";
+            }
+        }
+        s += edate(kr[0]) + " " + Math.round(kr[2]) + " km " + epad + " " +
+             phnear;
+        if (s.length < Itemlen) {
+            while (s.length < Itemlen) {
+                s += " ";
+            }
+        } else {
+            v += s + "\n";
+            s = "";
+        }
+    }
+    if (s.length > 0) {
+        v += s + "\n";
+    }
+    calcf.results.value = v;
+
+    //  Generate Moon phase table
+
+    v = "           New                      Full\n";
+    s = "";
+    for (l = 0; l < minx; l++) {
+        mp = phaset[l];
+        if (mp < 0) {
+            mp = - mp;
+        } else {
+            if (s.length == 0) {
+                s = pad(s, Pitemlen, " ");
+            }
+        }
+        s += "   " + jyear(mp)[0] + " " + edate(mp);
+        if (s.length < Pitemlen) {
+            while (s.length < Pitemlen) {
+                s += " ";
+            }
+        } else {
+            v += s + "\n";
+            s = "";
+        }
+    }
+    if (s.length > 0) {
+        v += s + "\n";
+    }
+    calcf.phases.value = v;
+
+    window.status = "Done.";
+}
+
+</script>
+
+<style> 
+textarea {
+
+  font-size: 11px;
+  width:Auto;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  background-color: #f8f8f8
+  
+}
+</style>
+
+</head>
+
+<body onload = "Main()" bgcolor="#eeeeee">
+<p><font color="#500000" size="4">تحقیقی اوقاتِ نماز و المینک</font> 
+<br> 
+
+<form  name="InForm">
+<table border="0">
+  <tbody >
+  <tr>
+    <td></td>
+    <td align="center">سال</td>
+    <td align="center">ماہ</td>
+    <td align="center">تاریخ</td>
+    <td colspan="2"></td>
+    <td>
+    <td align="center">گھنٹہ</td>
+    <td align="center">منٹ</td>
+    <td align="center">سیکنڈ</td>
+    <td colspan="2"></td>
+    <td align="center">سیکنڈ</td>
+    <td colspan="3"></td>
+  </tr>
+  <tr>
+    <td><font color="#000080" size="4"><b>&nbsp;تاریخ:&nbsp;</b></font></td>
+    <td><input type="number" min="0000" max="2099" step="1"  name="year"></td>
+    <td align="center"><input size="2"  name="month"></td>
+    <td><input size="2"  name="day"></td>
+    <td><select name ="am1">
+    <option selected value="1">Auto</option>
+    <option value="2">Manual</option>
+    <option value="3">Manual Hr</option>
+    </select></td>
+    <td>&nbsp; &nbsp; &nbsp;</td>
+    <td><font color="#000080" size="4"><b> (ST):&nbsp;</b></font></td>
+    <td><input size="2"  name="hour"></td>
+    <td><input size="2" name="minute"></td>
+    <td><input size="4" name="second"></td>
+    <td>&nbsp; &nbsp; &nbsp;</td>
+    <td><font color="#000080" size="4"><b>&nbsp;&#916;T:&nbsp;</b></font></td>
+    <td><input type="number" min="0" max="1000" step="1" value="70" name="delta"></td>
+    <td>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</td>
+    <td><input onclick="Main()" value="حل" type="button">&nbsp;</td>
+    <td><input value="صاف" type="reset"></td>
+  </tr>
+  <tr>
+  <td></td>
+   <td><input size="4" value="30.18607" placeholder="عرض بلد " name="arzb"></td>
+  <td><input size="4" value="71.45647" placeholder="طول بلد " name="toolb"></td>
+  <td><input size="4" value="5"  placeholder="معیاری وقت" name="st1"></td>
+  <td><input size="4" value="426" placeholder="بلندی" name="arzh"></td>
+  <td><select name ="arzh1"> 
+  <option value="1"> فٹ</option> 
+  <option value="2">میٹر</option>
+  </select></td>
+  <td><input size="2" value = "1010"   placeholder="پریشر ہوا " name="mbar"></td>
+  <td><input size="2" value = "12.714"   placeholder="ہوا ٹمپریچر " name="tempc"></td>
+  <td colspan= "6"><input size="4" value = "31.775818"   placeholder="عرض مطلوب" name="arzm">
+  <input size="4" value = "35.235761"   placeholder="طول مطلوب" name="toolm">
+  <input size="4" value = "92"   placeholder="سمت مطلوب" name="ddir">
+  <input size="2" value = "0.000999"   placeholder="درستگی s" name="amsec"></td>
+  
+  </tr>
+  <tr>
+    <td colspan="15">---------------------------------------------------------------------------------------------------------------------</td>
+  </tr>
+  </tbody>
+</table>
+</form>
+  
+<form  name="OutForm">
+ <table  border="0" cellspacing="4">
+  <tbody>
+  <tr>
+  <td>&nbsp;</td>
+  <td>
+  	  <input size="16" name="ymd0">
+  	  <input size="16" name="zawal0">
+  	<input size="16" name="sset0">
+  	<td>
+  	<td>
+  <input size="16" name="ymd">
+  <input size="16" name="midn">
+   <input size="16" name="shari">
+   <input size="16" name="fajar">
+   <input size="16" name="srise">
+	 <input size="16" name="midd">
+	 <input size="16" name="zawal">
+	  <input size="16" name="asrs">	  
+	  <input size="16" name="asrs1">	 
+	 <input size="16" name="asrh">	  
+	 <input size="16" name="asrh1">	  
+	<input size="16" name="sset">
+	<input size="16" name="ishas">
+	<input size="16" name="ishah">
+	
+
+	
+	<td>
+	<td>
+	  	  <input size="16" name="ymd1">
+	 <input size="16" name="midn2">
+  <input size="16" name="shari1">
+    <input size="16" name="fajar2">
+    <input size="16" name="zawal2">
+  </td>
+  <td></td>
+  
+  <td></td>
+  <td></td>
+  <td colspan="3">
+  <input size="26" name="ymdm">
+  <input size="26" name="tmoon">	  
+  <input size="26" name="mrise">
+  <input size="26" name="fmoon">
+  <input size="26" name="mset">
+  	<input disabled size="26" value="  بہ وقتِ غروب شمس">
+  	<input size="26" name="ssetm">
+    <input size="26" name="dirs">
+    <input size="26" name="dirm">
+    <input size="26" name="dirp">
+  	 <input size="26" name="millum">    	
+  <input size="26" name="fset">
+  <input size="26" name="emoons">
+  <input size="26" name="LDists">
+   <input size="26" name="dirm2">  
+  
+  </td>
+ 
+  
+  </tr>
+  <tr><td>
+    <td colspan="15">  <input size="16" name="ymd2">---------------------------------------------------------------------------------------------------------------------</td>
+  </tr>
+  <tr>
+  <td colspan="16">
+  <input disabled size="8" value="جگہ">
+  <input size="8" value="قبلہ">
+  <input size="8" value="مدینۃ المنورہ">
+  <input size="8" value="مسجد اقصٰی">
+  <input size="8" value="بغداد شریف">
+   <input size="8" value="بریلی شریف">
+   <input size="8" value="فیضانِ مدینہ کراچی">
+   <input size="8" value="مقام مطلوب">
+   <input size="8" value="سمت مطلوب">
+   </td>
+   </tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="سمت">
+<input size="8" name="qdir">
+<input size="8" name="mdir">
+<input size="8" name="adir">
+<input size="8" name="bdir">
+<input size="8" name="brdir">
+<input size="8" name="fdir">
+<input size="8" name="pdir">
+<input size="8" name="ddir">
+ </td>
+ </tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="فاصلہ">
+<input size="8" name="qds">
+<input size="8" name="mds">
+<input size="8" name="ads">
+<input size="8" name="bds">
+<input size="8" name="brds">
+<input size="8" name="fds">
+<input size="8" name="pds">
+<input size="8" value="---">
+ </td>
+ </tr>
+ <tr>
+ <td colspan="16">اوقاتِ شمس برائے سمت</td>
+ </tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="جانب سمت وقت ١">
+<input size="8" name="qdir1s">
+<input size="8" name="mdir1s">
+<input size="8" name="adir1s">
+<input size="8" name="bdir1s">
+<input size="8" name="brdir1s">
+<input size="8" name="fdir1s">
+<input size="8" name="pdir1s">
+<input size="8" name="ddir1s">
+ </td>
+ </tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="جانبِ سمت وقت ٢">
+<input size="8" name="qdir2s">
+<input size="8" name="mdir2s">
+<input size="8" name="adir2s">
+<input size="8" name="bdir2s">
+<input size="8" name="brdir2s">
+<input size="8" name="fdir2s">
+<input size="8" name="pdir2s">
+<input size="8" name="ddir2s">
+ </td>
+ </tr>
+ <tr>
+ <td colspan="16">
+ <input disabled size="8" value="90° انحراف وقت ١">
+ <input size="8" name="qdir3s">
+ <input size="8" name="mdir3s">
+ <input size="8" name="adir3s">
+ <input size="8" name="bdir3s">
+ <input size="8" name="brdir3s">
+ <input size="8" name="fdir3s">
+ <input size="8" name="pdir3s">
+ <input size="8" name="ddir3s">
+ </td>
+ </tr>
+ <tr>
+ <td colspan="16">
+ <input disabled size="8" value="90° انحراف وقت ٢">
+ <input size="8" name="qdir4s">
+ <input size="8" name="mdir4s">
+ <input size="8" name="adir4s">
+ <input size="8" name="bdir4s">
+ <input size="8" name="brdir4s">
+ <input size="8" name="fdir4s">
+ <input size="8" name="pdir4s">
+ <input size="8" name="ddir4s">
+ </td>
+ </tr>
+
+<tr>
+<td colspan="16">اوقاتِ قمر برائے سمت</td>
+</tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="جانب سمت وقت ١">
+<input size="8" name="qdir1m">
+<input size="8" name="mdir1m">
+<input size="8" name="adir1m">
+<input size="8" name="bdir1m">
+<input size="8" name="brdir1m">
+<input size="8" name="fdir1m">
+<input size="8" name="pdir1m">
+<input size="8" name="ddir1m">
+</td>
+</tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="جانبِ سمت وقت ٢">
+<input size="8" name="qdir2m">
+<input size="8" name="mdir2m">
+<input size="8" name="adir2m">
+<input size="8" name="bdir2m">
+<input size="8" name="brdir2m">
+<input size="8" name="fdir2m">
+<input size="8" name="pdir2m">
+<input size="8" name="ddir2m">
+</td>
+</tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="90° انحراف وقت ١">
+<input size="8" name="qdir3m">
+<input size="8" name="mdir3m">
+<input size="8" name="adir3m">
+<input size="8" name="bdir3m">
+<input size="8" name="brdir3m">
+<input size="8" name="fdir3m">
+<input size="8" name="pdir3m">
+<input size="8" name="ddir3m">
+</td>
+</tr>
+<tr>
+<td colspan="16">
+<input disabled size="8" value="90° انحراف وقت ٢">
+<input size="8" name="qdir4m">
+<input size="8" name="mdir4m">
+<input size="8" name="adir4m">
+<input size="8" name="bdir4m">
+<input size="8" name="brdir4m">
+<input size="8" name="fdir4m">
+<input size="8" name="pdir4m">
+<input size="8" name="ddir4m">
+</td>
+</tr>
+
+
+ 
+  <tr><td>
+    <td colspan="15"><input size="16" name="tmdt">---------------------------------------------------------------------------------------------------------------------</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">GHA</td>
+    <td></td>
+    <td align="center">SHA</td>
+    <td></td>
+    <td align="center">میل</td>
+    <td></td>
+    <td align="center">نصف قطر</td>
+    <td></td>
+    <td align="center">اختلاف منظر</td>
+    <td></td>
+    <td align="center">تعدیل ایام</td>
+  </tr>
+  <tr>
+    <td><font color="#500000" size="4"><b>شمس </b></font></td>
+    <td><input size="16" name="SunGHA">
+    <input size="16" name="dirsun">
+    <input size="16" name="ars">
+    <input size="16" name="sea">
+    </td>
+    <td></td>
+    <td><input size="16" name="SunSHA">
+    <input size="16" name="esun">
+    </td>
+    <td></td>
+    <td><input size="16" name="SunDEC">
+    <input size="16" name="R">
+    </td>
+    <td></td>
+    <td><input size="7" name="SunSD">
+
+    </td>
+    <td></td>
+    <td><input size="7" name="SunHP"></td>
+    <td></td>
+    <td>
+     <input size="16" name="EOTc">
+    <input size="16" name="EOT">
+    <input size="16" name="tdists">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="12"></td>
+  </tr>
+  <tr>
+    <td><font color="#500000" size="4"><b>قمر&nbsp;&nbsp;</b></font></td>
+    <td><input size="16" name="MoonGHA">
+    <input size="16" name="dirmoon">
+    <input size="16" name="arm">
+    <input size="16" name="mea">
+    </td>
+    <td></td>
+    <td><input size="16" name="MoonSHA">
+    <input size="16" name="emoon">
+      	<input size="16" name="mtqwm">
+      	  	<input size="16" name="Lm">
+    </td>
+    <td></td>
+    <td><input size="16" name="MoonDEC">
+    <input size="16" name="dEM">
+   	<input size="16" name="nm">
+    </td>
+    <td></td>
+    <td><input size="7" name="MoonSD">
+    </td>
+    <td></td>
+    <td><input size="7" name="MoonHP"></td>
+    <td></td>
+    <td align="right">
+        <input size="16" name="EOTm3">
+        <input size="16" name="tdistm">
+       <input size="16" name="EOTm4">
+    </td>
+    
+  </tr>
+  <tr>
+    <td colspan="12"></td>
+  </tr>
+  <tr>
+    <td><font color="#500000" size="4"><b>Polaris&nbsp;</b></font></td>
+    <td><input size="15" name="PolarisGHA"></td>
+    <td></td>
+    <td><input size="16" name="PolarisSHA"></td>
+    <td></td>
+    <td><input size="16" name="PolarisDEC"></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td align="right">چمک&nbsp;<input size="9" name="Moonillum">
+    <input size="16" name="mppa">
+    </td>
+    
+ 
+  </tr>
+  <tr>
+    <td colspan="12"></td>
+  </tr>  
+  <tr>
+    <td><font color="#500000" size="4"><b>Aries </b></font></td>
+    <td><input size="16" name="Aries">
+    	<input size="16" name="tqwm">
+    	<input size="16" name="teot">
+    	<input size="16" name="Ls">
+    </td>
+	<td></td>
+	<td>
+	<input size="16" name="sGHA">
+	<input size="16" name="seot">
+	    <input size="16" name="dirst">
+	        <input size="16" name="estar">
+	</td>
+    <td></td>
+    <td>
+    <input size="16" name="fst">
+    <input size="16" name="tst">
+    <input size="16" name="rises">
+    <input size="16" name="sets">
+    </td>
+    <td></td>
+    <td>
+   <input size="7" value="-16.713055555556" name="arzs">
+   <input size="7" value="6.7525" name="tools">
+       <input size="7" name="dtst">
+   </td>
+  </tr>
+  <tr>
+    <td colspan="12">&nbsp;</td>
+  </tr>
+  <tr>
+  
+  <td>
+  </td></tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">GAST</td>
+    <td></td>
+    <td align="center">GMST</td>
+    <td></td>
+    <td align="center">Eq. of Equinoxes</td>
+    <td></td>
+    <td align="center">&#916;&#968;</td>
+    <td></td>
+    <td align="center">&#916;&#949;</td>
+    <td></td>
+    <td align="center">Mean Obl. of Ecl.</td>
+  </tr>
+  <tr>
+    <td><font color="#500000" size="4"><b>Misc.</b></font></td>
+    <td><input size="16" name="SidTapp"></td>
+    <td></td>
+    <td><input size="16" name="SidTmean"></td>
+    <td></td>
+    <td><input size="16" name="EoEquin"></td>
+    <td></td>
+    <td><input size="7" name="dpsi"></td>
+    <td></td>
+    <td><input size="7" name="deps"></td>
+    <td></td>
+    <td><input size="16" name="obliq"></td>
+  </tr>
+  <tr>
+    <td colspan="12"></td>
+  </tr>
+  <tr><td></td></tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">JD</td>
+    <td></td>
+    <td align="center">JDE</td>
+    <td></td>
+    <td align="center">فصل نیرین</td>
+    <td></td>
+    <td align="center">Weekday</td>
+    <td></td>
+    <td align="center"></td>
+    <td></td>
+    <td align="center">True Obl. of Ecl.</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><input size="16" name="JulianDay"></td>
+    <td></td>
+    <td><input size="16" name="JulianEphemDay"></td>
+    <td></td>
+    <td><input size="16" name="LunarDist"></td>
+    <td></td>
+    <td><input size="7" name="DayOfWeek"></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td><input size="16" name="trueobliq"></td>
+  </tr>
+  </tbody>
+ </table>
+</form>
+<br></br>
+<textarea id="eotd" style="white-space: pre;"  name="eotd" rows="26" cols="111"></textarea>
+<br></br>
+<tr></tr>
+<textarea id="message" name="message" rows="19" cols="111"></textarea>
+
+<form id="calc" >
+
+<p>
+<b>Year:</b>
+<input type="text" value="2022" name="year41" value="" size="5" maxlength="6">
+<input type="button" value="Calculate" onclick="gen();">
+<input type="button" value="Previous year" onclick="form.year41.value--; gen();">
+<input type="button" value="Next year" onclick="form.year41.value++; gen();">
+<input type="button" value="Reload" onclick="window.location.reload(true)"></td>
+</p>
+<h3><a >New and Full Moons</a></h3>
+
+<p>
+<textarea name="phases" style="white-space: pre;" rows="16" cols="50">click calculate...</textarea>
+</p>
+<h3><a>Perigees and Apogees</a></h3>
+
+<p>
+<textarea name="results" style="white-space: pre;" rows="17" cols="70">click calculate ,
+</textarea>
+</p>
+
+
+
+</form>
+
+<br><br>
+<p> تحقیق ریسرچ گروپ </p>
+<p align="justify"><b>صلوا  على الحبيب صلی اللہ علٰی محمد ﷺ</b> <br>Update in progress...This computer almanac is based
+upon formulas published in <i>Astronomical Algorithms</i> by Jean Meeus.
+The program calculates Greenwich hour angle (GHA), sidereal hour angle
+(SHA), and declination (Dec) for sun, moon, and polaris.<br><br>
+Further, the following quantities are provided:<br><br>
+Greenwich hour angle of the vernal point (Aries)<br>
+Geocentric semidiameter (SD) and equatorial horizontal parallax (HP) for sun
+and moon<br>
+Equation of time<br>
+Phase of the moon (illuminated fraction of the moon's disk)<br> 
+Greenwich apparent sidereal time (GAST)<br>
+Greenwich mean sidereal time (GMST)<br>
+Equation of the equinoxes (= GAST&#8722;GMST)<br>
+Nutation in longitude (&#916;&#968;)<br>
+Nutation in obliquity (&#916;&#949;)<br>
+Mean obliquity of the ecliptic<br>
+True obliquity of the ecliptic (= mean obliquity + &#916;&#949;)<br>
+Julian date (JD)<br>
+Julian ephemeris date (JDE)<br>
+Geocentric lunar distance of the sun (center-center)<br>
+Day of the week<br><br>
+The almanac can be used for many decades, provided the &#916;T value (= TT&#8722;UT1)
+for the given date is known. An accuracy of approx. &plusmn;1s is sufficient for most
+applications. Errors in &#916;T have a much greater influence on the coordinates
+of the moon than on the other results. &#916;T is obtained through the following
+formula:<br><br>
+&#916;T = 32.184s + (TAI&#8722;UTC) &#8722; DUT1 <br><br>
+Current values for TAI&#8722;UTC and DUT1 (= UT1&#8722;UTC) are published on the web site
+of the <a href="http://maia.usno.navy.mil/"><i>IERS Rapid Service / Prediction 
+Center</i></a> (IERS Bulletin A). <br><br>Reliable long-term predictions for
+&#916;T are not possible. Here are some &#916;T values of the past:
+<br><br>
+1970.0:&nbsp;&nbsp;+40.2s<br>
+1975.0:&nbsp;&nbsp;+45.5s<br>
+1980.0:&nbsp;&nbsp;+50.5s<br>
+1985.0:&nbsp;&nbsp;+54.3s<br>
+1990.0:&nbsp;&nbsp;+56.9s<br>
+1995.0:&nbsp;&nbsp;+60.8s<br>
+2000.0:&nbsp;&nbsp;+63.8s<br>
+2005.0:&nbsp;&nbsp;+64.7s<br>
+2010.0:&nbsp;&nbsp;+66.1s<br>
+2015.0:&nbsp;&nbsp;+67.6s<br>
+2016.0:&nbsp;&nbsp;+68.1s<br>
+2021.6:&nbsp;&nbsp;+69.295s<br><br>
+
+The program regards any blank dialog box in the time input field as zero. A
+missing year, month, or day will result in an error message (program must be
+restarted). The number of the year must be entered in 4-digit format.<br><br>
+A "(+)" behind the value for the illuminated fraction of the moon's disk
+indicates a waxing moon, a "(&#8722;)" a waning moon.
+<br><br>
+SHA and GHA<sub>Aries</sub> refer to the true equinox of date.<br><br>
+
+</p><b>Accuracy (approximate values):</b><br>
+
+<table border="0">
+ <tbody>
+  <tr>
+    <td>GHA, SHA, and Dec of the sun: </td>
+    <td>&plusmn;1"</td>
+  </tr>
+  <tr>
+    <td>GHA and SHA of the moon: &nbsp;&nbsp;</td>
+    <td>&plusmn;10"</td>
+  </tr>
+  <tr>
+    <td>Dec of the moon: &nbsp;&nbsp;</td>
+    <td>&plusmn;5"</td>
+  </tr>
+  <tr>
+    <td>GHA and SHA of Polaris: </td>
+    <td>&plusmn;2"</td>
+  </tr>
+  <tr>
+    <td>Dec of Polaris: </td>
+    <td>&plusmn;1"</td>
+  </tr>
+  <tr>
+    <td>GHA Aries: &nbsp;&nbsp;</td>
+    <td>&plusmn;1"</td>
+  </tr>
+  <tr>
+    <td>HP and SD: </td>
+    <td>&plusmn;0.1"</td>
+  </tr>
+  <tr>
+    <td>Equation of Time: </td>
+    <td>&plusmn;0.1s</td>
+  </tr>
+  <tr>
+    <td>GAST, GMST, and Equation of Equinoxes: &nbsp;&nbsp;</td>
+    <td>&plusmn;0.001s</td>
+  </tr>
+  <tr>
+    <td>Nutation (&#916;&#968; and &#916;&#949;): </td>
+    <td>&plusmn;0.001"</td>
+  </tr>
+  <tr>
+    <td>Mean Obliquity of the Ecliptic: </td>
+    <td>&plusmn;0.001"</td>
+  </tr>
+  <tr>
+    <td>Lunar distance of sun: </td>
+    <td>&plusmn;10"</td>
+  </tr>
+ </tbody>
+</table>
+
+<br><br>
+
+<hr>
+<hr>
+
+</body>
+
+</html>
