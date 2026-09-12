@@ -1,0 +1,6 @@
+{
+  "appId": "com.prayertime.app",
+  "appName": "Prayer Time",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
